@@ -34,6 +34,8 @@ header{position:sticky;top:0;z-index:100;background:rgba(15,17,23,.92);backdrop-
 #search::placeholder{color:var(--dim);}
 .header-right{display:flex;align-items:center;gap:8px;flex-shrink:0;}
 .nav-link-forti{display:flex;align-items:center;gap:5px;padding:6px 14px;border-radius:8px;border:1px solid rgba(251,113,36,.35);background:rgba(251,113,36,.08);color:#fb7124;font-size:.8rem;font-weight:600;text-decoration:none;transition:all .15s;}
+.nav-link-ps{display:flex;align-items:center;gap:5px;padding:6px 14px;border-radius:8px;border:1px solid rgba(74,222,128,.35);background:rgba(74,222,128,.08);color:#4ade80;font-size:.8rem;font-weight:600;text-decoration:none;transition:all .15s;}
+.nav-link-ps:hover{background:rgba(74,222,128,.16);border-color:rgba(74,222,128,.6);}
 .nav-link-forti:hover{background:rgba(251,113,36,.16);border-color:rgba(251,113,36,.6);}
 .pill{display:flex;align-items:center;gap:5px;border-radius:20px;padding:4px 10px;font-size:.72rem;font-weight:600;}
 .pill-count{background:var(--accent-bg);border:1px solid var(--border2);color:var(--accent);}
@@ -117,6 +119,7 @@ mark{background:rgba(124,140,248,.25);color:var(--accent);border-radius:2px;padd
     <input type="text" id="search" placeholder="Befehle suchen...">
   </div>
   <div class="header-right">
+    <a href="scripts.html" class="nav-link-ps">💚 PS Scripts</a>
     <a href="forti.html" class="nav-link-forti">🔥 Fortinet</a>
     <div class="pill pill-count"><span id="visible-count">0</span> Befehle</div>
   </div>

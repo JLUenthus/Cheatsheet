@@ -95,6 +95,8 @@ header {
 #search::placeholder { color: var(--dim); }
 
 .header-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.nav-link-ps{display:flex;align-items:center;gap:5px;padding:6px 14px;border-radius:8px;border:1px solid rgba(74,222,128,.35);background:rgba(74,222,128,.08);color:#4ade80;font-size:.8rem;font-weight:600;text-decoration:none;transition:all .15s;}
+.nav-link-ps:hover{background:rgba(74,222,128,.16);}
 .nav-link-windows {
   display: flex; align-items: center; gap: 5px;
   padding: 6px 14px; border-radius: 8px;
@@ -280,6 +282,7 @@ mark { background: rgba(251,113,36,0.22); color: var(--accent); border-radius: 2
   </div>
   <div class="header-right">
     <a href="index.html" class="nav-link-windows">⚡ Windows</a>
+    <a href="scripts.html" class="nav-link-ps">💚 PS Scripts</a>
     <div class="pill pill-count">
       <span id="visible-count">0</span> Befehle
     </div>

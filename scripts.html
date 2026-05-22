@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PowerShell Scripts</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg:#0f1117;--panel:#1a1d2e;--panel2:#21253a;--border:#2a2d3e;--border2:#343860;
+  --text:#e0e4f0;--muted:#8890aa;--dim:#555a70;
+  --accent:#4ade80;--accent2:#22c55e;--accent-bg:rgba(74,222,128,0.10);--accent-glow:rgba(74,222,128,0.20);
+  --blue:#7c8cf8;--purple:#a78bfa;--amber:#fbbf24;--red:#f87171;--teal:#2dd4bf;
+  --font-ui:'Outfit',sans-serif;--font-mono:'JetBrains Mono',monospace;
+  --r:10px;--r-lg:14px;
+}
+html{scroll-behavior:smooth;}
+body{font-family:var(--font-ui);background:var(--bg);color:var(--text);font-size:.875rem;min-height:100vh;line-height:1.5;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(74,222,128,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(74,222,128,.02) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
+
+/* HEADER */
+header{position:sticky;top:0;z-index:100;background:rgba(15,17,23,.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:0 24px;height:58px;display:flex;align-items:center;justify-content:space-between;gap:16px;}
+.logo{display:flex;align-items:center;gap:10px;flex-shrink:0;text-decoration:none;}
+.logo-icon{width:32px;height:32px;background:var(--accent-bg);border:1px solid rgba(74,222,128,.3);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:17px;}
+.logo-text{font-size:1rem;font-weight:700;color:var(--text);letter-spacing:-.02em;}
+.logo-text span{color:var(--accent);}
+.search-wrap{flex:1;max-width:400px;position:relative;}
+.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none;}
+#search{width:100%;background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:8px 12px 8px 36px;color:var(--text);font-family:var(--font-ui);font-size:.85rem;outline:none;transition:border-color .2s,box-shadow .2s;}
+#search:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow);}
+#search::placeholder{color:var(--dim);}
+.header-right{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.nav-link{display:flex;align-items:center;gap:5px;padding:6px 14px;border-radius:8px;border:1px solid var(--border2);background:var(--panel);color:var(--muted);font-size:.8rem;font-weight:600;text-decoration:none;transition:all .15s;}
+.nav-link:hover{color:var(--text);background:var(--panel2);}
+.nav-link-forti{border-color:rgba(251,113,36,.35);background:rgba(251,113,36,.08);color:#fb7124;}
+.nav-link-forti:hover{background:rgba(251,113,36,.16);}
+.pill{display:flex;align-items:center;gap:5px;border-radius:20px;padding:4px 10px;font-size:.72rem;font-weight:600;background:var(--accent-bg);border:1px solid rgba(74,222,128,.3);color:var(--accent);}
+
+/* HERO */
+.hero{position:relative;z-index:1;text-align:center;padding:52px 24px 36px;}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;background:var(--accent-bg);border:1px solid rgba(74,222,128,.3);border-radius:20px;padding:4px 14px;font-size:.75rem;font-weight:600;color:var(--accent);margin-bottom:18px;letter-spacing:.04em;}
+.hero h1{font-size:clamp(1.8rem,4vw,2.6rem);font-weight:700;letter-spacing:-.03em;line-height:1.15;margin-bottom:12px;background:linear-gradient(135deg,#e0e4f0 0%,#4ade80 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hero p{color:var(--muted);font-size:.95rem;max-width:560px;margin:0 auto 28px;}
+.hero-stats{display:flex;justify-content:center;gap:24px;flex-wrap:wrap;}
+.hero-stat{display:flex;flex-direction:column;align-items:center;gap:2px;}
+.hero-stat-num{font-size:1.3rem;font-weight:700;color:var(--accent);}
+.hero-stat-label{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;}
+
+/* FILTER */
+.filter-bar{position:relative;z-index:1;padding:0 24px 20px;display:flex;gap:6px;flex-wrap:wrap;justify-content:center;}
+.filter-btn{display:flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;border:1px solid var(--border);background:var(--panel);color:var(--muted);font-family:var(--font-ui);font-size:.8rem;font-weight:500;cursor:pointer;transition:all .15s;}
+.filter-btn:hover{border-color:var(--border2);color:var(--text);background:var(--panel2);}
+.filter-btn.active{background:var(--accent-bg);border-color:rgba(74,222,128,.4);color:var(--accent);}
+.filter-dot{width:7px;height:7px;border-radius:50%;}
+
+/* MAIN */
+main{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:0 24px 80px;}
+
+/* SCRIPT CARD */
+.script-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(480px,1fr));gap:14px;}
+.script-card{background:var(--panel);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;transition:border-color .15s,transform .1s;}
+.script-card:hover{border-color:var(--border2);transform:translateY(-1px);}
+.script-card.hidden{display:none;}
+
+.card-header{padding:16px 18px 12px;display:flex;align-items:flex-start;gap:12px;}
+.card-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.card-meta{flex:1;min-width:0;}
+.card-title{font-size:.95rem;font-weight:700;color:var(--text);margin-bottom:3px;}
+.card-subtitle{font-size:.78rem;color:var(--muted);}
+.card-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px;}
+.tag{font-size:.65rem;font-weight:600;padding:2px 8px;border-radius:4px;text-transform:uppercase;letter-spacing:.03em;}
+.tag-system{background:rgba(124,140,248,.12);color:#7c8cf8;}
+.tag-benutzer{background:rgba(251,191,36,.12);color:#fbbf24;}
+.tag-netzwerk{background:rgba(45,212,191,.12);color:#2dd4bf;}
+.tag-software{background:rgba(167,139,250,.12);color:#a78bfa;}
+.tag-admin{background:rgba(248,113,113,.12);color:#f87171;}
+.tag-export{background:rgba(74,222,128,.12);color:#4ade80;}
+.tag-remote{background:rgba(45,212,191,.12);color:#2dd4bf;}
+
+.card-body{padding:0 18px 14px;}
+.card-desc{font-size:.82rem;color:var(--muted);line-height:1.6;margin-bottom:12px;}
+
+/* usage box */
+.usage-box{background:rgba(0,0,0,.25);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:12px;}
+.usage-label{font-size:.65rem;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;}
+.usage-line{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
+.usage-line:last-child{margin-bottom:0;}
+.usage-cmd{font-family:var(--font-mono);font-size:.72rem;color:var(--accent);flex:1;word-break:break-all;}
+.usage-copy{font-size:.65rem;color:var(--dim);padding:2px 6px;border-radius:4px;border:1px solid transparent;cursor:pointer;white-space:nowrap;transition:all .15s;background:none;}
+.usage-line:hover .usage-copy{color:var(--muted);border-color:var(--border);background:var(--panel);}
+.usage-copy.copied{color:var(--accent)!important;border-color:rgba(74,222,128,.3)!important;}
+
+/* params */
+.params-toggle{font-size:.75rem;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:5px;margin-bottom:8px;user-select:none;}
+.params-toggle:hover{color:var(--text);}
+.params-list{display:none;background:rgba(0,0,0,.2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:12px;}
+.params-list.open{display:block;}
+.param-row{display:flex;gap:8px;margin-bottom:6px;font-size:.78rem;}
+.param-row:last-child{margin-bottom:0;}
+.param-name{font-family:var(--font-mono);color:var(--blue);font-size:.72rem;min-width:160px;flex-shrink:0;}
+.param-desc{color:var(--muted);}
+
+/* download btn */
+.card-footer{padding:0 18px 16px;display:flex;gap:8px;align-items:center;}
+.btn-download{display:flex;align-items:center;gap:7px;padding:9px 18px;border-radius:8px;background:var(--accent-bg);border:1px solid rgba(74,222,128,.35);color:var(--accent);font-family:var(--font-ui);font-size:.82rem;font-weight:600;cursor:pointer;text-decoration:none;transition:all .15s;}
+.btn-download:hover{background:rgba(74,222,128,.18);border-color:rgba(74,222,128,.6);}
+.btn-download svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.btn-view{display:flex;align-items:center;gap:7px;padding:9px 14px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:var(--font-ui);font-size:.82rem;font-weight:500;cursor:pointer;transition:all .15s;}
+.btn-view:hover{border-color:var(--border2);color:var(--text);background:var(--panel2);}
+.file-info{margin-left:auto;font-size:.72rem;color:var(--dim);font-family:var(--font-mono);}
+
+/* code preview modal */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;align-items:center;justify-content:center;padding:20px;}
+.modal-bg.open{display:flex;}
+.modal{background:var(--panel);border:1px solid var(--border2);border-radius:var(--r-lg);width:100%;max-width:800px;max-height:85vh;display:flex;flex-direction:column;overflow:hidden;}
+.modal-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.modal-title{font-size:.95rem;font-weight:700;color:var(--text);}
+.modal-close{background:none;border:none;color:var(--muted);font-size:1.3rem;cursor:pointer;padding:0 4px;line-height:1;}
+.modal-close:hover{color:var(--text);}
+.modal-body{overflow:auto;padding:0;}
+pre{font-family:var(--font-mono);font-size:.75rem;color:#c9d1d9;background:#0d1117;padding:20px;margin:0;overflow:auto;line-height:1.6;white-space:pre;}
+.modal-footer{padding:12px 20px;border-top:1px solid var(--border);display:flex;gap:8px;flex-shrink:0;}
+
+#no-results{display:none;text-align:center;color:var(--muted);padding:60px 0;font-size:1rem;}
+#toast{position:fixed;bottom:24px;right:24px;background:var(--panel2);border:1px solid var(--border2);border-radius:10px;padding:10px 18px;font-size:.82rem;color:var(--accent);font-weight:500;box-shadow:0 8px 32px rgba(0,0,0,.4);opacity:0;transform:translateY(8px);transition:all .2s;pointer-events:none;z-index:999;}
+#toast.show{opacity:1;transform:translateY(0);}
+footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:20px 24px;text-align:center;color:var(--dim);font-size:.78rem;}
+footer span{color:var(--muted);}
+mark{background:rgba(74,222,128,.2);color:var(--accent);border-radius:2px;padding:0 1px;}
+
+@media(max-width:600px){
+  .script-grid{grid-template-columns:1fr;}
+  header{padding:0 14px;}
+  main{padding:0 14px 60px;}
+  .header-right .nav-link span{display:none;}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <a href="index.html" class="logo">
+    <div class="logo-icon">💚</div>
+    <div class="logo-text">PS<span>Scripts</span></div>
+  </a>
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input type="text" id="search" placeholder="Skripte suchen...">
+  </div>
+  <div class="header-right">
+    <a href="index.html" class="nav-link"><span>⚡</span><span>Windows</span></a>
+    <a href="forti.html" class="nav-link nav-link-forti"><span>🔥</span><span>Fortinet</span></a>
+    <div class="pill"><span id="visible-count">0</span> Skripte</div>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="hero-badge">💚 PowerShell Script-Bibliothek</div>
+  <h1>Fertige Skripte.<br>Direkt einsatzbereit.</h1>
+  <p>Geprüfte PowerShell-Skripte für Windows-Administratoren. Beschreibung lesen, Parameter anpassen, herunterladen und loslegen.</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><span class="hero-stat-num" id="stat-total">0</span><span class="hero-stat-label">Skripte</span></div>
+    <div class="hero-stat"><span class="hero-stat-num">4</span><span class="hero-stat-label">Kategorien</span></div>
+    <div class="hero-stat"><span class="hero-stat-num">PS 5.1+</span><span class="hero-stat-label">kompatibel</span></div>
+    <div class="hero-stat"><span class="hero-stat-num">.ps1</span><span class="hero-stat-label">Direkt-Download</span></div>
+  </div>
+</div>
+
+<div class="filter-bar" id="filter-bar">
+  <button class="filter-btn active" data-filter="all"><span class="filter-dot" style="background:#4ade80"></span>Alle</button>
+  <button class="filter-btn" data-filter="system"><span class="filter-dot" style="background:#7c8cf8"></span>Systeminfo & Inventar</button>
+  <button class="filter-btn" data-filter="benutzer"><span class="filter-dot" style="background:#fbbf24"></span>Benutzer & AD</button>
+  <button class="filter-btn" data-filter="netzwerk"><span class="filter-dot" style="background:#2dd4bf"></span>Netzwerk & Diagnose</button>
+  <button class="filter-btn" data-filter="software"><span class="filter-dot" style="background:#a78bfa"></span>Software & Updates</button>
+</div>
+
+<main>
+  <div id="no-results">Keine Skripte gefunden für "<span id="search-term"></span>"</div>
+  <div class="script-grid" id="grid"></div>
+</main>
+
+<footer>PSScripts · <span>PowerShell 5.1+ · Windows 10/11 & Server 2019/2022</span> · Alle Skripte im Ordner /powershell/</footer>
+<div id="toast">✓ Kopiert!</div>
+
+<!-- Code Preview Modal -->
+<div class="modal-bg" id="modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-title">Skript</span>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body"><pre id="modal-code"></pre></div>
+    <div class="modal-footer">
+      <button class="btn-view" onclick="copyCode()">📋 Code kopieren</button>
+      <a id="modal-dl" href="#" class="btn-download" download>
+        <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Herunterladen
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+const SCRIPTS = [
+  {
+    id: 'inv-system',
+    title: 'Get-SystemInventory',
+    file: 'powershell/Get-SystemInventory.ps1',
+    category: 'system',
+    icon: '🖥️',
+    iconBg: 'rgba(124,140,248,.12)',
+    subtitle: 'Vollständiger System-Inventarbericht als HTML',
+    desc: 'Erstellt einen detaillierten HTML-Report mit CPU, RAM, Festplatten, Netzwerkadaptern, installierter Software und den letzten Windows-Updates. Ideal für Erstaufnahmen neuer Geräte oder regelmäßige Inventarisierung.',
+    tags: ['system','export'],
+    usage: [
+      { label: 'Standard (Desktop)', cmd: '.\\Get-SystemInventory.ps1' },
+      { label: 'Eigener Speicherpfad', cmd: '.\\Get-SystemInventory.ps1 -OutputPath "C:\\Reports\\inv.html"' },
+    ],
+    params: [
+      { name: '-OutputPath', desc: 'Speicherort für HTML-Report. Standard: Desktop mit Datumsstempel.' },
+    ],
+    requirements: 'PowerShell 5.1+, keine Admin-Rechte für Basis-Info',
+  },
+  {
+    id: 'user-localadmins',
+    title: 'Get-LocalAdmins',
+    file: 'powershell/Get-LocalAdmins.ps1',
+    category: 'benutzer',
+    icon: '👥',
+    iconBg: 'rgba(251,191,36,.12)',
+    subtitle: 'Lokale Administratoren auflisten – lokal & remote',
+    desc: 'Liest die lokale Administratoren-Gruppe auf einem oder mehreren Computern aus. Zeigt Benutzername, Typ (Benutzer/Gruppe) und Herkunft (lokal/Domäne). Perfekt für Sicherheits-Audits und Compliance-Checks.',
+    tags: ['benutzer','admin','remote','export'],
+    usage: [
+      { label: 'Lokal', cmd: '.\\Get-LocalAdmins.ps1' },
+      { label: 'Remote (mehrere PCs)', cmd: '.\\Get-LocalAdmins.ps1 -ComputerName "PC01","PC02"' },
+      { label: 'Aus Datei + CSV Export', cmd: '.\\Get-LocalAdmins.ps1 -ComputerName (Get-Content C:\\pcs.txt) -ExportCSV C:\\admins.csv' },
+    ],
+    params: [
+      { name: '-ComputerName', desc: 'Ein oder mehrere Computernamen. Standard: lokaler Rechner.' },
+      { name: '-ExportCSV', desc: 'Optionaler Pfad für CSV-Export der Ergebnisse.' },
+    ],
+    requirements: 'PowerShell 5.1+, WinRM aktiv für Remote-Abfragen, Admin-Rechte',
+  },
+  {
+    id: 'net-connectivity',
+    title: 'Test-NetworkConnectivity',
+    file: 'powershell/Test-NetworkConnectivity.ps1',
+    category: 'netzwerk',
+    icon: '🌐',
+    iconBg: 'rgba(45,212,191,.12)',
+    subtitle: 'Ping & Port-Tests für definierbare Zielliste',
+    desc: 'Testet Ping-Erreichbarkeit und TCP-Ports für eine anpassbare Liste von Hosts. Farbige Konsolenausgabe zeigt auf einen Blick welche Verbindungen OK oder FAIL sind. Ideal nach Firewall-Änderungen oder VPN-Checks.',
+    tags: ['netzwerk','export'],
+    usage: [
+      { label: 'Standard (vordefinierte Ziele)', cmd: '.\\Test-NetworkConnectivity.ps1' },
+      { label: 'Mit CSV-Export', cmd: '.\\Test-NetworkConnectivity.ps1 -ExportCSV "C:\\netzwerk.csv"' },
+    ],
+    params: [
+      { name: '-ExportCSV', desc: 'Optionaler Pfad für CSV-Export aller Testergebnisse.' },
+    ],
+    requirements: 'PowerShell 5.1+, keine Admin-Rechte – Ziele im Skript anpassen!',
+    note: '💡 Ziele in der $targets-Hashtable im Skript anpassen bevor Ausführung.',
+  },
+  {
+    id: 'sw-installed',
+    title: 'Get-InstalledSoftware',
+    file: 'powershell/Get-InstalledSoftware.ps1',
+    category: 'software',
+    icon: '📦',
+    iconBg: 'rgba(167,139,250,.12)',
+    subtitle: 'Software-Inventar lokal & remote – CSV/HTML Export',
+    desc: 'Liest alle installierten Programme aus der Registry (32- und 64-Bit). Filterbar nach Name oder Hersteller. Unterstützt Remote-Abfragen und exportiert als CSV oder als durchsuchbare HTML-Seite. Ideal für Lizenz-Audits.',
+    tags: ['software','remote','export'],
+    usage: [
+      { label: 'Lokal, alle Programme', cmd: '.\\Get-InstalledSoftware.ps1' },
+      { label: 'Filtern nach Hersteller', cmd: '.\\Get-InstalledSoftware.ps1 -Filter "Microsoft*"' },
+      { label: 'Remote + CSV', cmd: '.\\Get-InstalledSoftware.ps1 -ComputerName "PC01" -ExportCSV "C:\\sw.csv"' },
+      { label: 'HTML-Report', cmd: '.\\Get-InstalledSoftware.ps1 -ExportHTML "$env:USERPROFILE\\Desktop\\sw.html"' },
+    ],
+    params: [
+      { name: '-ComputerName', desc: 'Zielcomputer. Standard: lokaler Rechner.' },
+      { name: '-Filter', desc: 'Wildcard-Filter nach Name oder Hersteller. z.B. "Adobe*"' },
+      { name: '-ExportCSV', desc: 'Pfad für CSV-Export.' },
+      { name: '-ExportHTML', desc: 'Pfad für HTML-Export mit eingebauter Suchfunktion.' },
+    ],
+    requirements: 'PowerShell 5.1+, Admin-Rechte für Remote-Abfragen, WinRM aktiv',
+  },
+];
+
+// Build cards
+const grid = document.getElementById('grid');
+let toastTimer;
+
+function buildCards() {
+  grid.innerHTML = '';
+  SCRIPTS.forEach(s => {
+    const usageRows = s.usage.map(u => `
+      <div class="usage-line">
+        <span class="usage-cmd">${u.cmd.replace(/</g,'&lt;')}</span>
+        <button class="usage-copy" onclick="copyUsage(event,'${u.cmd.replace(/'/g,"\\'")}')">📋</button>
+      </div>`).join('');
+
+    const paramRows = s.params.map(p => `
+      <div class="param-row">
+        <span class="param-name">${p.name}</span>
+        <span class="param-desc">${p.desc}</span>
+      </div>`).join('');
+
+    const tagHTML = s.tags.map(t => `<span class="tag tag-${t}">${t}</span>`).join('');
+    const noteHTML = s.note ? `<div style="font-size:.78rem;color:#fbbf24;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.2);border-radius:6px;padding:7px 10px;margin-bottom:10px;">${s.note}</div>` : '';
+
+    const card = document.createElement('div');
+    card.className = 'script-card';
+    card.dataset.id = s.id;
+    card.dataset.category = s.category;
+    card.dataset.search = (s.title + ' ' + s.subtitle + ' ' + s.desc + ' ' + s.tags.join(' ')).toLowerCase();
+
+    card.innerHTML = `
+      <div class="card-header">
+        <div class="card-icon" style="background:${s.iconBg}">${s.icon}</div>
+        <div class="card-meta">
+          <div class="card-title">${s.title}<span style="font-family:var(--font-mono);font-weight:400;font-size:.72rem;color:var(--dim);margin-left:8px;">.ps1</span></div>
+          <div class="card-subtitle">${s.subtitle}</div>
+          <div class="card-tags">${tagHTML}</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-desc">${s.desc}</div>
+        ${noteHTML}
+        <div class="usage-box">
+          <div class="usage-label">Verwendung</div>
+          ${usageRows}
+        </div>
+        <div class="params-toggle" onclick="toggleParams(this)">
+          <span style="font-size:12px">▶</span> Parameter anzeigen (${s.params.length})
+        </div>
+        <div class="params-list">
+          <div style="font-size:.7rem;color:var(--dim);margin-bottom:8px;font-family:var(--font-mono);">Parameter</div>
+          ${paramRows}
+          <div style="font-size:.72rem;color:var(--dim);margin-top:8px;padding-top:8px;border-top:1px solid var(--border);">⚙️ ${s.requirements}</div>
+        </div>
+      </div>
+      <div class="card-footer">
+        <a href="${s.file}" download class="btn-download">
+          <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download .ps1
+        </a>
+        <button class="btn-view" onclick="showCode('${s.id}')">
+          👁 Code ansehen
+        </button>
+        <span class="file-info">${s.file.split('/').pop()}</span>
+      </div>`;
+    grid.appendChild(card);
+  });
+
+  document.getElementById('stat-total').textContent = SCRIPTS.length;
+  document.getElementById('visible-count').textContent = SCRIPTS.length;
+}
+
+function toggleParams(el) {
+  const list = el.nextElementSibling;
+  const open = list.classList.toggle('open');
+  el.querySelector('span').textContent = open ? '▼' : '▶';
+}
+
+function copyUsage(e, cmd) {
+  e.stopPropagation();
+  navigator.clipboard.writeText(cmd).then(() => {
+    const btn = e.target;
+    btn.textContent = '✓';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '📋'; btn.classList.remove('copied'); }, 1500);
+    showToast();
+  });
+}
+
+function showToast() {
+  const t = document.getElementById('toast');
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+// Code preview – fetches the .ps1 file
+function showCode(id) {
+  const s = SCRIPTS.find(x => x.id === id);
+  if (!s) return;
+  document.getElementById('modal-title').textContent = s.title + '.ps1';
+  document.getElementById('modal-dl').href = s.file;
+  document.getElementById('modal-dl').download = s.file.split('/').pop();
+  document.getElementById('modal-code').textContent = 'Lade...';
+  document.getElementById('modal').classList.add('open');
+  fetch(s.file)
+    .then(r => r.text())
+    .then(txt => { document.getElementById('modal-code').textContent = txt; })
+    .catch(() => { document.getElementById('modal-code').textContent = '⚠️ Datei nicht gefunden.\nSkript-Datei muss im Ordner /powershell/ liegen.'; });
+}
+
+function closeModal() { document.getElementById('modal').classList.remove('open'); }
+document.getElementById('modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+function copyCode() {
+  const code = document.getElementById('modal-code').textContent;
+  navigator.clipboard.writeText(code).then(showToast);
+}
+
+// Filter & search
+let activeFilter = 'all', searchTerm = '';
+
+document.getElementById('filter-bar').addEventListener('click', e => {
+  const btn = e.target.closest('.filter-btn');
+  if (!btn) return;
+  activeFilter = btn.dataset.filter;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.toggle('active', b === btn));
+  applyFilters();
+});
+
+document.getElementById('search').addEventListener('input', e => {
+  searchTerm = e.target.value.toLowerCase().trim();
+  document.getElementById('search-term').textContent = searchTerm;
+  applyFilters();
+});
+
+function highlight(text, term) {
+  if (!term) return text;
+  return text.replace(new RegExp(`(${term.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, 'gi'), '<mark>$1</mark>');
+}
+
+function applyFilters() {
+  let visible = 0;
+  document.querySelectorAll('.script-card').forEach(card => {
+    const matchCat = activeFilter === 'all' || card.dataset.category === activeFilter;
+    const matchSearch = !searchTerm || card.dataset.search.includes(searchTerm);
+    const show = matchCat && matchSearch;
+    card.classList.toggle('hidden', !show);
+    if (show) {
+      visible++;
+      if (searchTerm) {
+        const title = card.querySelector('.card-title');
+        const desc  = card.querySelector('.card-desc');
+        title.innerHTML = highlight(title.textContent, searchTerm) + '<span style="font-family:var(--font-mono);font-weight:400;font-size:.72rem;color:var(--dim);margin-left:8px;">.ps1</span>';
+        desc.innerHTML  = highlight(desc.textContent, searchTerm);
+      } else {
+        const title = card.querySelector('.card-title');
+        const desc  = card.querySelector('.card-desc');
+        const s = SCRIPTS.find(x => x.id === card.dataset.id);
+        title.innerHTML = s.title + '<span style="font-family:var(--font-mono);font-weight:400;font-size:.72rem;color:var(--dim);margin-left:8px;">.ps1</span>';
+        desc.innerHTML  = s.desc;
+      }
+    }
+  });
+  document.getElementById('visible-count').textContent = visible;
+  document.getElementById('no-results').style.display = visible === 0 ? 'block' : 'none';
+}
+
+buildCards();
+</script>
+</body>
+</html>
