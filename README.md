@@ -1,9 +1,9 @@
 # 🛠️ IT Admin Cheatsheet
 
 Eine interaktive Web-Referenz für Windows- und Fortinet-Administratoren.  
-Befehle suchen, filtern und per Klick in die Zwischenablage kopieren. Plus eine fertige PowerShell-Skript-Bibliothek zum direkten Download.
+Befehle suchen, filtern und per Klick in die Zwischenablage kopieren – plus eine fertige PowerShell-Skript-Bibliothek zum direkten Download.
 
-🔗 **[→ Zur Live-Version](https://jluenthus.github.io/Cheatsheet)**
+🔗 **[→ Zur Live-Version](https://DEINNAME.github.io/REPO-NAME)**
 
 ---
 
@@ -13,8 +13,10 @@ Befehle suchen, filtern und per Klick in die Zwischenablage kopieren. Plus eine 
 |-------|-------------|
 | [`index.html`](index.html) | Windows Admin Cheatsheet – MSC-Konsolen, Netzwerk, PowerShell, GPO, Remote & mehr |
 | [`forti.html`](forti.html) | Fortinet Cheatsheet – FortiGate, FortiManager, FortiAnalyzer CLI-Befehle |
+| [`mitmachen.html`](mitmachen.html) | Formular zum Einreichen von Befehlen, Scripts & Ideen per Outlook |
 | [`scripts.html`](scripts.html) | PowerShell Script-Bibliothek – fertige Skripte zum Download |
-| [`powershell/`](powershell/) | Ordner mit allen `.ps1` Skript-Dateien |
+| [`mitmachen.html
+powershell/`](powershell/) | Ordner mit allen `.ps1` Skript-Dateien |
 
 ---
 
@@ -55,10 +57,14 @@ Fertige, dokumentierte PowerShell-Skripte mit Direkt-Download.
 
 | Skript | Kategorie | Beschreibung |
 |--------|-----------|-------------|
-| [`Get-SystemInventory.ps1`](powershell/Get-SystemInventory.ps1) | Systeminfo | HTML-Report mit CPU, RAM, Disk, Software, Updates |
-| [`Get-LocalAdmins.ps1`](powershell/Get-LocalAdmins.ps1) | Benutzer & AD | Lokale Administratoren lokal & remote auslesen |
-| [`Test-NetworkConnectivity.ps1`](powershell/Test-NetworkConnectivity.ps1) | Netzwerk | Ping & Port-Tests für anpassbare Zielliste |
-| [`Get-InstalledSoftware.ps1`](powershell/Get-InstalledSoftware.ps1) | Software | Software-Inventar mit Filter, CSV & HTML-Export |
+| [`Get-SystemInventory.ps1`](mitmachen.html
+powershell/Get-SystemInventory.ps1) | Systeminfo | HTML-Report mit CPU, RAM, Disk, Software, Updates |
+| [`Get-LocalAdmins.ps1`](mitmachen.html
+powershell/Get-LocalAdmins.ps1) | Benutzer & AD | Lokale Administratoren lokal & remote auslesen |
+| [`Test-NetworkConnectivity.ps1`](mitmachen.html
+powershell/Test-NetworkConnectivity.ps1) | Netzwerk | Ping & Port-Tests für anpassbare Zielliste |
+| [`Get-InstalledSoftware.ps1`](mitmachen.html
+powershell/Get-InstalledSoftware.ps1) | Software | Software-Inventar mit Filter, CSV & HTML-Export |
 
 ---
 
@@ -71,6 +77,7 @@ index.html
 forti.html
 scripts.html
 README.md
+mitmachen.html
 powershell/
   Get-SystemInventory.ps1
   Get-LocalAdmins.ps1
@@ -103,14 +110,16 @@ Dann im Browser öffnen: `http://localhost:8080`
 
 ## ➕ Eigene Skripte hinzufügen
 
-1. `.ps1`-Datei in den Ordner `powershell/` legen
+1. `.ps1`-Datei in den Ordner `mitmachen.html
+powershell/` legen
 2. In `scripts.html` das `SCRIPTS`-Array um einen Eintrag erweitern:
 
 ```javascript
 {
   id: 'mein-skript',
   title: 'Mein-Skript',
-  file: 'powershell/Mein-Skript.ps1',
+  file: 'mitmachen.html
+powershell/Mein-Skript.ps1',
   category: 'system',          // system | benutzer | netzwerk | software
   icon: '🔧',
   iconBg: 'rgba(124,140,248,.12)',

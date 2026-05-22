@@ -129,6 +129,10 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:20
 footer span{color:var(--muted);}
 mark{background:rgba(74,222,128,.2);color:var(--accent);border-radius:2px;padding:0 1px;}
 
+.nav-link-mitmachen{border-color:rgba(167,139,250,.35);background:rgba(167,139,250,.08);color:#a78bfa;}
+.nav-link-mitmachen:hover{background:rgba(167,139,250,.18);}
+.footer-mitmachen{display:inline-flex;align-items:center;gap:8px;margin-top:12px;padding:9px 20px;border-radius:9px;border:1px solid rgba(167,139,250,.35);background:rgba(167,139,250,.08);color:#a78bfa;text-decoration:none;font-size:.82rem;font-weight:600;transition:all .15s;}
+.footer-mitmachen:hover{background:rgba(167,139,250,.2);border-color:rgba(167,139,250,.6);}
 @media(max-width:600px){
   .script-grid{grid-template-columns:1fr;}
   header{padding:0 14px;}
@@ -149,6 +153,7 @@ mark{background:rgba(74,222,128,.2);color:var(--accent);border-radius:2px;paddin
     <input type="text" id="search" placeholder="Skripte suchen...">
   </div>
   <div class="header-right">
+    <a href="mitmachen.html" class="nav-link nav-link-mitmachen">🤝 Mitmachen</a>
     <a href="index.html" class="nav-link"><span>⚡</span><span>Windows</span></a>
     <a href="forti.html" class="nav-link nav-link-forti"><span>🔥</span><span>Fortinet</span></a>
     <div class="pill"><span id="visible-count">0</span> Skripte</div>
@@ -180,7 +185,8 @@ mark{background:rgba(74,222,128,.2);color:var(--accent);border-radius:2px;paddin
   <div class="script-grid" id="grid"></div>
 </main>
 
-<footer>PSScripts · <span>PowerShell 5.1+ · Windows 10/11 & Server 2019/2022</span> · Alle Skripte im Ordner /powershell/</footer>
+<footer><a href="mitmachen.html" class="footer-mitmachen">🤝 Script einreichen</a><br>
+  PSScripts · <span>PowerShell 5.1+ · Windows 10/11 & Server 2019/2022</span> · Alle Skripte im Ordner /powershell/</footer>
 <div id="toast">✓ Kopiert!</div>
 
 <!-- Code Preview Modal -->
