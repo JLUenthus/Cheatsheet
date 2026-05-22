@@ -77,6 +77,37 @@
     .as-tab-icon { font-size:14px; }
 
 
+
+    /* ── UPDATE BANNER ── */
+    .as-update-bar {
+      position:fixed;top:0;left:0;right:0;z-index:1000;
+      background:#1a1d2e;border-bottom:1px solid rgba(74,222,128,.3);
+      padding:10px 20px;
+      display:flex;align-items:center;justify-content:center;gap:12px;
+      transform:translateY(-100%);transition:transform .3s ease;
+      font-size:.82rem;
+    }
+    .as-update-bar.show { transform:translateY(0); }
+    .as-update-text { color:#e0e4f0; }
+    .as-update-text span { color:#4ade80;font-weight:700; }
+    .as-update-btn {
+      display:flex;align-items:center;gap:6px;
+      padding:6px 16px;border-radius:8px;
+      background:rgba(74,222,128,.12);border:1px solid rgba(74,222,128,.35);
+      color:#4ade80;font-family:inherit;font-size:.8rem;font-weight:600;
+      cursor:pointer;transition:all .15s;white-space:nowrap;
+    }
+    .as-update-btn:hover { background:rgba(74,222,128,.22); }
+    .as-update-dismiss {
+      background:none;border:none;color:var(--dim,#555a70);
+      font-size:16px;cursor:pointer;padding:0 4px;line-height:1;
+      transition:color .15s;
+    }
+    .as-update-dismiss:hover { color:var(--muted,#8890aa); }
+
+    /* Push header down when banner is visible */
+    body.has-update header { top:42px; }
+    body.has-update .as-tab-bar { top:100px; }
     /* ── SCROLL TO TOP ── */
     .as-scroll-top {
       position:fixed;bottom:32px;right:calc((100vw - 1200px) / 4);z-index:400;
@@ -233,5 +264,60 @@
   window.addEventListener('scroll', () => {
     scrollBtn.classList.toggle('visible', window.scrollY > 300);
   }, { passive: true });
+
+
+  // ── SW UPDATE HANDLER ────────────────────────────────────
+  if ('serviceWorker' in navigator) {
+    // Create update banner (hidden initially)
+    const bar = document.createElement('div');
+    bar.className = 'as-update-bar';
+    bar.innerHTML = `
+      <span class="as-update-text">⚡ <span>Neue Version verfügbar!</span> Die Seite wurde aktualisiert.</span>
+      <button class="as-update-btn" onclick="window.location.reload()">🔄 Jetzt aktualisieren</button>
+      <button class="as-update-dismiss" onclick="this.closest('.as-update-bar').classList.remove('show');document.body.classList.remove('has-update')" title="Schließen">✕</button>
+    `;
+    document.body.prepend(bar);
+
+    // Listen for SW update message
+    navigator.serviceWorker.addEventListener('message', e => {
+      if (e.data?.type === 'SW_UPDATED') {
+        bar.classList.add('show');
+        document.body.classList.add('has-update');
+      }
+    });
+
+    // Check for waiting SW on page load (for returning visitors)
+    navigator.serviceWorker.ready.then(reg => {
+      if (reg.waiting) {
+        // There's already a waiting SW - show banner immediately
+        bar.classList.add('show');
+        document.body.classList.add('has-update');
+        // Tell waiting SW to take over when user clicks reload
+        bar.querySelector('.as-update-btn').addEventListener('click', () => {
+          reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+        }, { once: true });
+      }
+
+      // Watch for future updates
+      reg.addEventListener('updatefound', () => {
+        const newWorker = reg.installing;
+        newWorker.addEventListener('statechange', () => {
+          if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+            bar.classList.add('show');
+            document.body.classList.add('has-update');
+            bar.querySelector('.as-update-btn').addEventListener('click', () => {
+              newWorker.postMessage({ type: 'SKIP_WAITING' });
+            }, { once: true });
+          }
+        });
+      });
+    });
+
+    // Reload all tabs when SW takes control
+    let refreshing = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (!refreshing) { refreshing = true; window.location.reload(); }
+    });
+  }
 
 })();
