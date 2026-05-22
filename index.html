@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Windows Admin Cheatsheet</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg:#0f1117;--panel:#1a1d2e;--panel2:#21253a;--border:#2a2d3e;--border2:#343860;
+  --text:#e0e4f0;--muted:#8890aa;--dim:#555a70;
+  --accent:#7c8cf8;--accent2:#a78bfa;--accent-bg:rgba(124,140,248,0.10);--accent-glow:rgba(124,140,248,0.20);
+  --green:#4ade80;--green-bg:rgba(74,222,128,0.08);
+  --amber:#fbbf24;--amber-bg:rgba(251,191,36,0.08);
+  --red:#f87171;--red-bg:rgba(248,113,113,0.08);
+  --teal:#2dd4bf;--teal-bg:rgba(45,212,191,0.08);
+  --pink:#f472b6;
+  --font-ui:'Outfit',sans-serif;--font-mono:'JetBrains Mono',monospace;
+  --r:10px;--r-lg:14px;
+}
+html{scroll-behavior:smooth;}
+body{font-family:var(--font-ui);background:var(--bg);color:var(--text);font-size:.875rem;min-height:100vh;line-height:1.5;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(124,140,248,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(124,140,248,.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
+header{position:sticky;top:0;z-index:100;background:rgba(15,17,23,.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:0 24px;height:58px;display:flex;align-items:center;justify-content:space-between;gap:16px;}
+.logo{display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.logo-icon{width:32px;height:32px;background:var(--accent-bg);border:1px solid var(--border2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;}
+.logo-text{font-size:1rem;font-weight:700;color:var(--text);letter-spacing:-.02em;}
+.logo-text span{color:var(--accent);}
+.search-wrap{flex:1;max-width:400px;position:relative;}
+.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:15px;pointer-events:none;}
+#search{width:100%;background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:8px 12px 8px 36px;color:var(--text);font-family:var(--font-ui);font-size:.85rem;outline:none;transition:border-color .2s,box-shadow .2s;}
+#search:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow);}
+#search::placeholder{color:var(--dim);}
+.header-right{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.nav-link-forti{display:flex;align-items:center;gap:5px;padding:6px 14px;border-radius:8px;border:1px solid rgba(251,113,36,.35);background:rgba(251,113,36,.08);color:#fb7124;font-size:.8rem;font-weight:600;text-decoration:none;transition:all .15s;}
+.nav-link-forti:hover{background:rgba(251,113,36,.16);border-color:rgba(251,113,36,.6);}
+.pill{display:flex;align-items:center;gap:5px;border-radius:20px;padding:4px 10px;font-size:.72rem;font-weight:600;}
+.pill-count{background:var(--accent-bg);border:1px solid var(--border2);color:var(--accent);}
+.hero{position:relative;z-index:1;text-align:center;padding:52px 24px 40px;}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;background:var(--accent-bg);border:1px solid var(--border2);border-radius:20px;padding:4px 14px;font-size:.75rem;font-weight:600;color:var(--accent);margin-bottom:18px;letter-spacing:.04em;}
+.hero h1{font-size:clamp(1.8rem,4vw,2.6rem);font-weight:700;letter-spacing:-.03em;line-height:1.15;margin-bottom:12px;background:linear-gradient(135deg,#e0e4f0 0%,#a78bfa 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hero p{color:var(--muted);font-size:.95rem;max-width:520px;margin:0 auto 28px;}
+.hero-stats{display:flex;justify-content:center;gap:24px;flex-wrap:wrap;}
+.hero-stat{display:flex;flex-direction:column;align-items:center;gap:2px;}
+.hero-stat-num{font-size:1.3rem;font-weight:700;color:var(--accent);}
+.hero-stat-label{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;}
+.filter-bar{position:relative;z-index:1;padding:0 24px 20px;display:flex;gap:6px;flex-wrap:wrap;justify-content:center;}
+.filter-btn{display:flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;border:1px solid var(--border);background:var(--panel);color:var(--muted);font-family:var(--font-ui);font-size:.8rem;font-weight:500;cursor:pointer;transition:all .15s;}
+.filter-btn:hover{border-color:var(--border2);color:var(--text);background:var(--panel2);}
+.filter-btn.active{background:var(--accent-bg);border-color:var(--accent);color:var(--accent);}
+.filter-dot{width:7px;height:7px;border-radius:50%;}
+main{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:0 24px 80px;}
+.section{margin-bottom:28px;}
+.section-header{display:flex;align-items:center;gap:10px;margin-bottom:10px;padding:0 2px;}
+.section-icon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.section-title{font-size:.9rem;font-weight:600;color:var(--text);letter-spacing:-.01em;}
+.section-count{font-size:.72rem;color:var(--muted);background:var(--panel);border:1px solid var(--border);border-radius:20px;padding:1px 8px;}
+.cmd-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:8px;}
+.cmd-card{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;cursor:pointer;transition:border-color .15s,background .15s,transform .1s;position:relative;overflow:hidden;display:flex;flex-direction:column;gap:6px;}
+.cmd-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:3px 0 0 3px;opacity:0;transition:opacity .2s;}
+.cmd-card:hover{border-color:var(--border2);background:var(--panel2);transform:translateY(-1px);}
+.cmd-card:hover::before{opacity:1;}
+.cmd-card:active{transform:scale(.99);}
+.c-msc::before{background:var(--accent);}
+.c-system::before{background:var(--green);}
+.c-network::before{background:var(--teal);}
+.c-ps::before{background:var(--accent2);}
+.c-users::before{background:var(--amber);}
+.c-disk::before{background:var(--red);}
+.c-proc::before{background:var(--pink);}
+.c-remote::before{background:var(--teal);}
+.c-gpo::before{background:var(--green);}
+.c-quick::before{background:var(--amber);}
+.cmd-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;}
+.cmd-name{font-size:.85rem;font-weight:600;color:var(--text);line-height:1.3;}
+.cmd-copy-btn{flex-shrink:0;display:flex;align-items:center;gap:4px;font-size:.7rem;color:var(--dim);padding:2px 7px;border-radius:5px;border:1px solid transparent;transition:all .15s;white-space:nowrap;}
+.cmd-card:hover .cmd-copy-btn{color:var(--muted);border-color:var(--border);background:var(--panel);}
+.cmd-copy-btn.copied{color:var(--green)!important;border-color:rgba(74,222,128,.3)!important;background:var(--green-bg)!important;}
+.cmd-code{font-family:var(--font-mono);font-size:.75rem;color:var(--accent);background:rgba(124,140,248,.06);border:1px solid rgba(124,140,248,.12);border-radius:6px;padding:6px 8px;word-break:break-all;line-height:1.5;}
+.cmd-desc{font-size:.78rem;color:var(--muted);line-height:1.45;}
+.cmd-tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:2px;}
+.cmd-tag{font-size:.65rem;font-weight:600;padding:2px 7px;border-radius:4px;letter-spacing:.03em;text-transform:uppercase;}
+.tag-admin{background:rgba(248,113,113,.12);color:#f87171;}
+.tag-info{background:rgba(124,140,248,.12);color:var(--accent);}
+.tag-ps{background:rgba(167,139,250,.12);color:var(--accent2);}
+.tag-network{background:rgba(45,212,191,.12);color:var(--teal);}
+.tag-caution{background:rgba(251,191,36,.12);color:var(--amber);}
+.tag-repair{background:rgba(248,113,113,.12);color:var(--red);}
+.tag-remote{background:rgba(45,212,191,.12);color:var(--teal);}
+.tag-quick{background:rgba(74,222,128,.12);color:var(--green);}
+.cmd-card.hidden{display:none;}
+.section.hidden{display:none;}
+#no-results{display:none;text-align:center;color:var(--muted);padding:60px 0;font-size:1rem;}
+#toast{position:fixed;bottom:24px;right:24px;background:var(--panel2);border:1px solid var(--border2);border-radius:10px;padding:10px 18px;font-size:.82rem;color:var(--green);font-weight:500;display:flex;align-items:center;gap:7px;box-shadow:0 8px 32px rgba(0,0,0,.4);opacity:0;transform:translateY(8px);transition:all .2s;pointer-events:none;z-index:999;}
+#toast.show{opacity:1;transform:translateY(0);}
+footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:20px 24px;text-align:center;color:var(--dim);font-size:.78rem;}
+footer span{color:var(--muted);}
+mark{background:rgba(124,140,248,.25);color:var(--accent);border-radius:2px;padding:0 1px;}
+@media(max-width:600px){
+  .cmd-grid{grid-template-columns:1fr;}
+  .hero h1{font-size:1.6rem;}
+  header{padding:0 14px;}
+  main{padding:0 14px 60px;}
+  .filter-bar{padding:0 14px 16px;}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">
+    <div class="logo-icon">⚡</div>
+    <div class="logo-text">Admin<span>Sheet</span></div>
+  </div>
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input type="text" id="search" placeholder="Befehle suchen...">
+  </div>
+  <div class="header-right">
+    <a href="forti.html" class="nav-link-forti">🔥 Fortinet</a>
+    <div class="pill pill-count"><span id="visible-count">0</span> Befehle</div>
+  </div>
+</header>
+<div class="hero">
+  <div class="hero-badge">⚡ Windows Admin Cheatsheet</div>
+  <h1>Alle Befehle.<br>Sofort zur Hand.</h1>
+  <p>Professionelle Referenz für Windows-Administratoren. Einmal klicken – direkt in die Zwischenablage.</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><span class="hero-stat-num" id="stat-cmds">0</span><span class="hero-stat-label">Befehle</span></div>
+    <div class="hero-stat"><span class="hero-stat-num">10</span><span class="hero-stat-label">Kategorien</span></div>
+    <div class="hero-stat"><span class="hero-stat-num">Win 10/11</span><span class="hero-stat-label">kompatibel</span></div>
+    <div class="hero-stat"><span class="hero-stat-num">Server</span><span class="hero-stat-label">2019/2022</span></div>
+  </div>
+</div>
+<div class="filter-bar" id="filter-bar"></div>
+<main>
+  <div id="no-results">Keine Befehle gefunden für "<span id="search-term"></span>"</div>
+  <div id="sections"></div>
+</main>
+<footer>Windows Admin Cheatsheet · <span>Windows 10/11 & Server 2019/2022</span> · Klick kopiert den Befehl</footer>
+<div id="toast">✓ Kopiert!</div>
+<script>
+const SECTIONS = [
+  { id:'msc', label:'MMC-Konsolen', icon:'🖥️', color:'c-msc', dotColor:'#7c8cf8', filter:'msc', items:[
+    { name:'Computerverwaltung', cmd:'%SystemRoot%\\system32\\compmgmt.msc /s', desc:'Alles in einer Konsole: Datenträger, Dienste, Ereignisanzeige, lokale Benutzer. Der Einstiegspunkt für fast alles.', tags:['admin','info'] },
+    { name:'Datenträgerverwaltung', cmd:'%SystemRoot%\\system32\\diskmgmt.msc', desc:'Partitionen erstellen, löschen, formatieren und Laufwerksbuchstaben vergeben. Kein Neustart nötig für hot-plug Datenträger.', tags:['admin'] },
+    { name:'Defragmentierung', cmd:'%SystemRoot%\\system32\\dfrg.msc', desc:'Optimiert HDD-Fragmentation. Bei SSDs stattdessen "Optimieren" nutzen – das löst TRIM aus, kein Defrag.', tags:['info'] },
+    { name:'Dienste', cmd:'%SystemRoot%\\system32\\services.msc /s', desc:'Alle Windows-Dienste starten, stoppen, deaktivieren oder auf Autostart setzen. Basis für Server-Administration.', tags:['admin'] },
+    { name:'Ereignisanzeige', cmd:'%SystemRoot%\\system32\\eventvwr.msc /s', desc:'System-, Anwendungs- und Sicherheitslogs. Erste Anlaufstelle bei Fehlern – System-Log nach kritischen Events filtern.', tags:['info'] },
+    { name:'Geräte-Manager', cmd:'%SystemRoot%\\system32\\devmgmt.msc', desc:'Hardware, Treiber und Gerätekonflikte. Gelbe Ausrufezeichen = Problem. Rechtsklick → Treiber aktualisieren.', tags:['admin'] },
+    { name:'Gruppenrichtlinien-Editor', cmd:'%SystemRoot%\\system32\\gpedit.msc', desc:'Nur auf Pro/Enterprise. Richtlinien für Computer und Benutzer konfigurieren. Nach Änderungen: gpupdate /force.', tags:['admin','caution'] },
+    { name:'Komponentendienste', cmd:'%SystemRoot%\\system32\\Com\\comexp.msc', desc:'COM/COM+-Anwendungen und DCOM-Konfiguration. Wird bei verteilten Anwendungen und IIS-Problemen benötigt.', tags:['admin'] },
+    { name:'Leistungsüberwachung', cmd:'%SystemRoot%\\system32\\perfmon.msc /s', desc:'CPU, RAM, Disk I/O und Netzwerk in Echtzeit. Datenkollektoren für langfristiges Monitoring konfigurierbar.', tags:['info'] },
+    { name:'Lokale Sicherheitsrichtlinie', cmd:'%SystemRoot%\\system32\\secpol.msc /s', desc:'Passwort-Richtlinien, Kontosperrung, Audit-Richtlinien und Benutzerrechte. Gilt nur für lokale Konten.', tags:['admin','caution'] },
+    { name:'Lokale Benutzer & Gruppen', cmd:'%SystemRoot%\\system32\\lusrmgr.msc /s', desc:'Lokale Konten und Gruppen verwalten. Benutzer deaktivieren, Kennwort zurücksetzen, Gruppenmitgliedschaften ändern.', tags:['admin'] },
+    { name:'Zertifikate (Benutzer)', cmd:'certmgr.msc', desc:'Persönlicher Zertifikat-Store des aktuellen Benutzers. SSL-Zertifikate, Code-Signing, E-Mail-Verschlüsselung.', tags:['info'] },
+    { name:'Zertifikate (Computer)', cmd:'certlm.msc', desc:'Maschinenweiter Zertifikat-Store. Für Server-Zertifikate und maschinenweite VPN/WLAN-Konfiguration.', tags:['admin'] },
+    { name:'Aufgabenplanung', cmd:'taskschd.msc', desc:'Geplante Tasks erstellen und verwalten. Trigger: Zeit, Ereignis, Anmeldung. Mächtiger als der alte at-Befehl.', tags:['admin'] },
+    { name:'Drucker-Verwaltung', cmd:'printmanagement.msc', desc:'Alle Drucker, Treiber und Ports zentral verwalten. Auch Remote-Drucker auf anderen Servern einsehbar.', tags:['admin'] },
+  ]},
+  { id:'system', label:'Systeminformationen', icon:'📊', color:'c-system', dotColor:'#4ade80', filter:'system', items:[
+    { name:'Systeminfo (Konsole)', cmd:'systeminfo', desc:'Vollständige Systemübersicht: OS-Version, RAM, Hotfixes, Netzwerk-Adapter, Domain-Mitgliedschaft. Unverzichtbar für Erstanalysen.', tags:['info'] },
+    { name:'Systeminfo → Desktop', cmd:'systeminfo > "%USERPROFILE%\\Desktop\\systeminfo.txt"', desc:'Ausgabe in Textdatei umleiten. Ideal um Systeminfo an Kollegen oder Support zu schicken ohne Remote-Zugriff.', tags:['info'] },
+    { name:'DirectX-Diagnose → Desktop', cmd:'dxdiag /t "%USERPROFILE%\\Desktop\\dxdiag.txt"', desc:'Detaillierter Report zu Grafik, Sound und DirectX-Version. Hilfreich bei Multimedia- und Treiberproblemen.', tags:['info'] },
+    { name:'Systeminfo + DXDiag kombiniert', cmd:'systeminfo > "%USERPROFILE%\\Desktop\\systeminfo.txt" && dxdiag /t "%USERPROFILE%\\Desktop\\dxdiag.txt"', desc:'Beide Reports auf einmal erstellen. Perfekt für vollständige System-Dokumentation in einem Schritt.', tags:['info'] },
+    { name:'Systeminfo GUI', cmd:'msinfo32', desc:'Grafische Alternative zu systeminfo. Zeigt Hardware-Ressourcen, IRQ-Konflikte, Software-Umgebung. Exportierbar als .nfo-Datei.', tags:['info'] },
+    { name:'Computername', cmd:'wmic computersystem get name', desc:'Gibt nur den Computernamen aus – ideal für Skripte. Alternativ: hostname (noch kürzer).', tags:['info','ps'] },
+    { name:'Azure AD / Domain-Status', cmd:'dsregcmd /status', desc:'Zeigt ob Gerät Domain-joined, Azure AD joined oder Hybrid-joined ist. Join-Timestamp und Tenant-ID ebenfalls sichtbar.', tags:['info'] },
+    { name:'Windows-Version (GUI)', cmd:'winver', desc:'Zeigt Windows-Build und Version grafisch. Build-Nummer wichtig für Feature-Support und Update-Kompatibilität.', tags:['info','quick'] },
+    { name:'Umgebungsvariablen anzeigen', cmd:'set', desc:'Alle Systemvariablen wie PATH, TEMP, USERNAME in der Konsole. Für Skript-Debugging oft entscheidend.', tags:['info'] },
+    { name:'Windows-Aktivierungsstatus', cmd:'slmgr /dlv', desc:'Lizenzstatus, Lizenztyp und verbleibende Aktivierungsversuche. /xpr zeigt nur Ablaufdatum – schneller.', tags:['admin','info'] },
+    { name:'Ressourcenmonitor', cmd:'resmon', desc:'Detailliertere Echtzeit-Ansicht als Task-Manager: CPU, RAM, Disk und Netzwerk pro Prozess. Perfekt für Performance-Analyse.', tags:['info'] },
+    { name:'DirectX-Diagnose (GUI)', cmd:'dxdiag', desc:'Grafische DirectX-Diagnose. Tabs für System, Anzeige, Sound. Fehlerberichte unter "Hinweise" beachten.', tags:['info'] },
+  ]},
+  { id:'network', label:'Netzwerk & Netzlaufwerke', icon:'🌐', color:'c-network', dotColor:'#2dd4bf', filter:'network', items:[
+    { name:'TCP-Einstellungen', cmd:'netsh int tcp show global', desc:'Zeigt TCP-Stack-Einstellungen: Autotuning, Chimney, ECN. Tuning bei hohen Latenzen oder Durchsatzproblemen.', tags:['network','info'] },
+    { name:'IP-Konfiguration vollständig', cmd:'ipconfig /all', desc:'Alle Adapter mit IP, Maske, Gateway, DNS, DHCP-Lease, MAC-Adresse. Erste Anlaufstelle bei Netzwerkproblemen.', tags:['network','info'] },
+    { name:'DNS-Cache leeren', cmd:'ipconfig /flushdns', desc:'Lokalen DNS-Cache verwerfen. Nötig nach DNS-Änderungen oder bei "falsche Seite" Problemen. Schnell und sicher.', tags:['network','quick'] },
+    { name:'IP erneuern', cmd:'ipconfig /release && ipconfig /renew', desc:'DHCP-Lease freigeben und neu beziehen. Bei IP-Konflikten oder nach DHCP-Server-Wechsel.', tags:['network','caution'] },
+    { name:'Offene Verbindungen', cmd:'netstat -ano', desc:'Alle TCP/UDP-Verbindungen mit PID. PID im Task-Manager nachschlagen um den Prozess zu identifizieren. -b zeigt direkt den Prozessnamen (Admin nötig).', tags:['network','info'] },
+    { name:'Routing-Tabelle', cmd:'route print', desc:'Alle Routen des Systems. Prüfen ob Standard-Gateway stimmt und ob spezifische Routen gesetzt sind.', tags:['network','info'] },
+    { name:'WLAN-Profile anzeigen', cmd:'netsh wlan show profiles', desc:'Alle gespeicherten WLAN-Netzwerke. Für jedes Profil kann separat das Passwort ausgelesen werden.', tags:['network','info'] },
+    { name:'WLAN-Passwort anzeigen', cmd:'netsh wlan show profile name="NETZWERKNAME" key=clear', desc:'Zeigt das Klartext-Passwort unter "Schlüsselinhalt". NETZWERKNAME durch echten SSID ersetzen. Nur Admin.', tags:['network','admin','caution'] },
+    { name:'Firewall-Status alle Profile', cmd:'netsh advfirewall show allprofiles', desc:'Status der Windows-Firewall für Domäne, Privat und Öffentlich. Schnell prüfen ob Firewall aktiv ist.', tags:['network','admin'] },
+    { name:'Netzwerkverbindungen GUI', cmd:'ncpa.cpl', desc:'Netzwerkadapter grafisch verwalten. Adapter deaktivieren, IP manuell setzen, Adapter-Eigenschaften öffnen.', tags:['network','quick'] },
+    { name:'Ping dauerhaft', cmd:'ping -t HOSTNAME', desc:'Fortlaufender Ping – Strg+C zum Stoppen, Strg+Pause für Statistik zwischendurch. Für Verbindungsüberwachung.', tags:['network','info'] },
+    { name:'Traceroute', cmd:'tracert HOSTNAME', desc:'Route zum Ziel mit Latenz pro Hop. Hilft Flaschenhälse oder Ausfälle im Netzwerkpfad zu lokalisieren.', tags:['network','info'] },
+    { name:'DNS-Abfrage', cmd:'nslookup HOSTNAME', desc:'DNS-Auflösung testen. Im interaktiven Modus (nslookup ohne Argument) auch bestimmte Server abfragen: server 8.8.8.8', tags:['network','info'] },
+    { name:'Netzwerkstatistik zurücksetzen', cmd:'netsh int ip reset && netsh winsock reset', desc:'TCP/IP-Stack und Winsock-Katalog zurücksetzen. Letztes Mittel bei hartnäckigen Netzwerkproblemen. Neustart nötig!', tags:['network','admin','caution'] },
+    { name:'Netzlaufwerk verbinden', cmd:'net use Z: \\\\SERVER\\FREIGABE /persistent:yes', desc:'Netzlaufwerk dauerhaft als Laufwerksbuchstabe einbinden. /persistent:yes bleibt nach Neustart. Buchstabe frei wählbar (Z, Y, X ...).', tags:['network'] },
+    { name:'Netzlaufwerk mit Anmeldedaten', cmd:'net use Z: \\\\SERVER\\FREIGABE /user:DOMÄNE\\BENUTZER PASSWORT /persistent:yes', desc:'Mit anderen Anmeldedaten verbinden – z.B. Service-Account. Passwort im Klartext in der Konsole, nur in sicherer Umgebung nutzen.', tags:['network','caution'] },
+    { name:'Alle Netzlaufwerke anzeigen', cmd:'net use', desc:'Alle verbundenen Netzlaufwerke und UNC-Verbindungen mit Status. OK = verbunden, Disconnected = getrennt aber gespeichert.', tags:['network','info'] },
+    { name:'Netzlaufwerk trennen', cmd:'net use Z: /delete', desc:'Einzelnes Netzlaufwerk trennen und aus gespeicherten Verbindungen entfernen. /delete * trennt alle auf einmal.', tags:['network','caution'] },
+    { name:'Share-Verbindung testen', cmd:'net use \\\\SERVER\\FREIGABE', desc:'Share ohne Laufwerksbuchstabe verbinden – prüft ob Zugriff möglich. Danach: net use \\\\SERVER\\FREIGABE /delete zum Trennen.', tags:['network','info'] },
+    { name:'Netzlaufwerk via PowerShell', cmd:'New-PSDrive -Name Z -PSProvider FileSystem -Root \\\\SERVER\\FREIGABE -Persist', desc:'PowerShell-Alternative zu net use. -Persist macht es dauerhaft. -Credential (Get-Credential) für andere Anmeldedaten.', tags:['network','ps'] },
+    { name:'Offene Shares anzeigen', cmd:'net share', desc:'Alle freigegebenen Ordner auf dem lokalen Rechner: Name, Pfad, Benutzer. Admin-Freigaben (C$, IPC$) ebenfalls sichtbar.', tags:['network','admin','info'] },
+    { name:'Verbundene User auf Share', cmd:'net session', desc:'Wer ist aktuell per Netzwerk verbunden: Computer, Benutzer, Sessions und Leerlaufzeit. Hilfreich vor Server-Neustart.', tags:['network','admin','info'] },
+  ]},
+  { id:'ps', label:'PowerShell', icon:'⚡', color:'c-ps', dotColor:'#a78bfa', filter:'ps', items:[
+    { name:'PS-Skript ausführen (Bypass)', cmd:'powershell.exe -ExecutionPolicy Bypass -File "C:\\Temp\\skript.ps1"', desc:'Umgeht die Execution Policy einmalig. Für Deployment-Skripte ideal. Sicherer als Policy dauerhaft zu deaktivieren.', tags:['ps','admin'] },
+    { name:'PS als Admin starten', cmd:'Start-Process powershell -Verb runAs', desc:'Öffnet neue erhöhte PowerShell-Instanz. UAC-Prompt erscheint. Aus bestehender PS-Session heraus nutzbar.', tags:['ps','admin'] },
+    { name:'Execution Policy setzen', cmd:'Set-ExecutionPolicy RemoteSigned -Scope CurrentUser', desc:'RemoteSigned: Lokale Skripte laufen, heruntergeladene müssen signiert sein. Scope CurrentUser = kein Admin nötig.', tags:['ps','info'] },
+    { name:'Execution Policy anzeigen', cmd:'Get-ExecutionPolicy -List', desc:'Alle Scopes: MachinePolicy, UserPolicy, Process, CurrentUser, LocalMachine. Höchste Priorität gewinnt.', tags:['ps','info'] },
+    { name:'Prozesse nach CPU sortiert', cmd:'Get-Process | Sort-Object CPU -Descending | Select -First 20', desc:'Top 20 CPU-Fresser. Kombinierbar: | Out-GridView für grafische Darstellung, | Stop-Process für Beenden.', tags:['ps','info'] },
+    { name:'Dienst neu starten', cmd:'Restart-Service -Name "Dienstname"', desc:'Sicherer als sc stop/start da auf Stopp gewartet wird. -Force wenn abhängige Dienste vorhanden. -PassThru zeigt Status.', tags:['ps','admin'] },
+    { name:'Alle laufenden Dienste', cmd:'Get-Service | Where-Object {$_.Status -eq "Running"}', desc:'Nur laufende Dienste. Status "Stopped" für gestoppte. Pipe zu | Select Name,Status,StartType für kompakte Ansicht.', tags:['ps','info'] },
+    { name:'Installierte Updates', cmd:'Get-HotFix | Sort-Object InstalledOn -Descending | Select -First 20', desc:'Letzte 20 installierte Updates mit Datum. KB-Nummer für Details auf Microsoft Update-Katalog suchen.', tags:['ps','info'] },
+    { name:'Installierte Software', cmd:'Get-ItemProperty HKLM:\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\* | Select DisplayName,DisplayVersion', desc:'Alle installierten Programme aus der Registry. Für 32-Bit-Programme auch ...Wow6432Node\\Uninstall\\* abfragen.', tags:['ps','info'] },
+    { name:'Laufwerke anzeigen', cmd:'Get-PSDrive -PSProvider FileSystem', desc:'Alle Laufwerke mit genutztem und freiem Speicher. Einfacher als WMI für Kapazitätsübersicht.', tags:['ps','info'] },
+    { name:'Festplatteninfo', cmd:'Get-PhysicalDisk', desc:'Physische Datenträger: Größe, Medientyp (SSD/HDD), Status. HealthStatus zeigt OK, Warning oder Unhealthy.', tags:['ps','info'] },
+    { name:'Ordnergröße berechnen', cmd:'Get-ChildItem "C:\\Ordner" -Recurse | Measure-Object -Property Length -Sum', desc:'Gesamtgröße eines Ordners inkl. Unterordner. .Sum ist in Bytes – durch 1GB teilen für lesbare Ausgabe.', tags:['ps','info'] },
+    { name:'Remote-Befehl ausführen', cmd:'Invoke-Command -ComputerName HOSTNAME -ScriptBlock { Get-Process }', desc:'Befehl auf Remote-PC ausführen. WinRM muss aktiv sein. -Credential für andere Anmeldedaten. Mehrere PCs möglich.', tags:['ps','admin','remote'] },
+    { name:'PSSession öffnen', cmd:'Enter-PSSession -ComputerName HOSTNAME', desc:'Interaktive Remote-PowerShell-Sitzung. Prompt wechselt auf Remote-PC. Exit-PSSession zum Beenden.', tags:['ps','admin','remote'] },
+  ]},
+  { id:'users', label:'Benutzer & Gruppen', icon:'👥', color:'c-users', dotColor:'#fbbf24', filter:'users', items:[
+    { name:'Lokale Benutzer anzeigen', cmd:'net user', desc:'Alle lokalen Benutzerkonten. Deaktivierte Konten mit Sternchen. Für Domain-User: net user /domain', tags:['admin'] },
+    { name:'Benutzerdetails', cmd:'net user BENUTZERNAME', desc:'Detailinfo: Letzter Login, Passwort-Ablauf, Gruppen, Anmeldestunden. Domain-User: net user BENUTZERNAME /domain', tags:['admin','info'] },
+    { name:'Lokale Gruppen anzeigen', cmd:'net localgroup', desc:'Alle lokalen Gruppen. Die wichtigsten: Administratoren, Remotedesktopbenutzer, Benutzer.', tags:['admin'] },
+    { name:'Gruppe anzeigen', cmd:'net localgroup Administratoren', desc:'Mitglieder einer lokalen Gruppe. Für andere Gruppen Namen anpassen. Zeigt auch Domain-Konten als Mitglieder.', tags:['admin','info'] },
+    { name:'Benutzer zu Gruppe hinzufügen', cmd:'net localgroup Administratoren BENUTZERNAME /add', desc:'Benutzer zur lokalen Admin-Gruppe hinzufügen. Domain-User: DOMÄNE\\BENUTZERNAME. Wirksam nach Neuanmeldung.', tags:['admin','caution'] },
+    { name:'Benutzer aus Gruppe entfernen', cmd:'net localgroup Administratoren BENUTZERNAME /delete', desc:'Benutzer aus lokaler Gruppe entfernen. Vorsicht: sich selbst aus Admins entfernen sperrt aus!', tags:['admin','caution'] },
+    { name:'Aktueller Benutzer & Rechte', cmd:'whoami /all', desc:'Vollständige Info: Benutzername, SID, Gruppen und Berechtigungen. Zeigt ob elevated (erhöhte Rechte) aktiv.', tags:['info'] },
+    { name:'Benutzer-Sessions anzeigen', cmd:'query user', desc:'Aktive und getrennte Sessions mit Session-ID, Status und Idle-Zeit. Basis für logoff-Befehl.', tags:['admin','info'] },
+    { name:'Benutzer abmelden', cmd:'logoff SESSION-ID', desc:'Session per ID abmelden. Session-ID aus "query user" entnehmen. Ungespeicherte Daten gehen verloren!', tags:['admin','caution'] },
+    { name:'Angemeldete User (PS)', cmd:'Get-CimInstance -ClassName Win32_ComputerSystem | Select Username', desc:'Aktuell interaktiv angemeldeter Benutzer per WMI. Funktioniert auch remote mit -ComputerName.', tags:['ps','info'] },
+  ]},
+  { id:'disk', label:'Datenträger & Reparatur', icon:'💾', color:'c-disk', dotColor:'#f87171', filter:'disk', items:[
+    { name:'Datenträger prüfen', cmd:'chkdsk C: /f /r', desc:'/f behebt Fehler, /r sucht fehlerhafte Sektoren und stellt lesbare Daten wieder her. Läuft beim nächsten Neustart wenn C: belegt.', tags:['admin','repair','caution'] },
+    { name:'Systemdateiprüfung', cmd:'sfc /scannow', desc:'Prüft alle geschützten Windows-Systemdateien und ersetzt fehlerhafte. Admin nötig. Dauer: 5–15 Minuten.', tags:['admin','repair'] },
+    { name:'DISM – Image prüfen', cmd:'DISM /Online /Cleanup-Image /CheckHealth', desc:'Schnelle Prüfung ob Beschädigungen im Windows-Image bekannt sind. Keine Reparatur, nur Statusabfrage.', tags:['admin','info'] },
+    { name:'DISM – Image scannen', cmd:'DISM /Online /Cleanup-Image /ScanHealth', desc:'Vollständiger Scan des Windows-Images auf Beschädigungen. Dauert länger als CheckHealth. Keine Reparatur.', tags:['admin','repair'] },
+    { name:'DISM – Image reparieren', cmd:'DISM /Online /Cleanup-Image /RestoreHealth', desc:'Lädt fehlende/beschädigte Dateien von Windows Update und repariert das Image. Internetverbindung nötig.', tags:['admin','repair'] },
+    { name:'Festplatteninfo (PS)', cmd:'Get-PhysicalDisk', desc:'Physische Platten: Typ (SSD/HDD/NVMe), Größe, Gesundheitsstatus. FriendlyName = Modellname.', tags:['ps','info'] },
+    { name:'WinRE aktivieren', cmd:'reagentc /enable', desc:'Windows Recovery Environment aktivieren. Notwendig für "Beim Start" Reparaturoptionen. Status: reagentc /info', tags:['admin','repair'] },
+    { name:'Systemwiederherstellung', cmd:'rstrui.exe', desc:'Windows zu einem früheren Wiederherstellungspunkt zurücksetzen. Nur verfügbar wenn Schutz aktiviert war.', tags:['admin','caution'] },
+  ]},
+  { id:'proc', label:'Prozesse & Dienste', icon:'⚙️', color:'c-proc', dotColor:'#f472b6', filter:'proc', items:[
+    { name:'Prozess beenden (Name)', cmd:'taskkill /IM prozess.exe /F', desc:'/F erzwingt das Beenden. Ohne /F wird erst versucht normal zu beenden. Mehrere: /IM a.exe /IM b.exe', tags:['admin'] },
+    { name:'Prozess beenden (PID)', cmd:'taskkill /PID 1234 /F', desc:'PID aus tasklist oder Task-Manager entnehmen. Präziser als Name, da mehrere Instanzen gleichen Namen haben.', tags:['admin'] },
+    { name:'Alle Prozesse auflisten', cmd:'tasklist', desc:'Name, PID, Sitzung, Speicherverbrauch. /FI "STATUS eq RUNNING" filtert. /FO CSV für Weiterverarbeitung.', tags:['info'] },
+    { name:'Prozess per PID suchen', cmd:'tasklist /FI "PID eq 1234"', desc:'Prozessname zu einer PID aus netstat ermitteln. Kombiniere mit netstat -ano um Verbindungen zuzuordnen.', tags:['info','network'] },
+    { name:'Dienst starten', cmd:'sc start Dienstname', desc:'Dienst starten. "sc start" wartet nicht auf vollständigen Start. Für Skripte besser: net start oder PowerShell.', tags:['admin'] },
+    { name:'Dienst stoppen', cmd:'sc stop Dienstname', desc:'Dienst anhalten. Abhängige Dienste werden nicht automatisch gestoppt – erst prüfen mit sc qc Dienstname.', tags:['admin'] },
+    { name:'Dienst-Autostart konfigurieren', cmd:'sc config Dienstname start= auto', desc:'Starttyp: auto, demand (manuell), disabled. Leerzeichen nach = ist Pflicht! delayed-auto für verzögerten Start.', tags:['admin'] },
+    { name:'Dienst abfragen', cmd:'sc query Dienstname', desc:'Aktueller Status: RUNNING, STOPPED, PAUSED. sc qc für Konfiguration (Pfad, Starttyp, Abhängigkeiten).', tags:['info'] },
+    { name:'Alle gestoppten Dienste', cmd:'sc query type= all state= inactive', desc:'Nur gestoppte Dienste auflisten. Nützlich um deaktivierte oder abgestürzte Dienste schnell zu finden.', tags:['info'] },
+  ]},
+  { id:'remote', label:'Remote & Support', icon:'🔗', color:'c-remote', dotColor:'#2dd4bf', filter:'remote', items:[
+    { name:'Remote Desktop starten', cmd:'mstsc', desc:'RDP-Client öffnen. /admin für Admin-Session (keine aktive Benutzersession nötig). /span für Multi-Monitor.', tags:['remote','quick'] },
+    { name:'RDP zu Host verbinden', cmd:'mstsc /v:HOSTNAME', desc:'Direkt zu Host verbinden. /v:HOST:PORT für nicht-Standard-Port. /f für Vollbild. /w:1920 /h:1080 für Auflösung.', tags:['remote'] },
+    { name:'Quick Assist (Win 11)', cmd:'quickassist', desc:'Microsoft Quick Assist für Remoteunterstützung. Kein VPN nötig, nur Internet. Sicher über Microsoft-Infrastruktur.', tags:['remote','quick'] },
+    { name:'Remoteunterstützung (Win 10)', cmd:'msra', desc:'Klassische Windows-Remoteunterstützung. Einladungsdatei erstellen oder E-Mail senden. Ohne Admin-Rechte nutzbar.', tags:['remote'] },
+    { name:'RDP aktivieren (PS)', cmd:'Set-ItemProperty -Path "HKLM:\\System\\CurrentControlSet\\Control\\Terminal Server" -Name "fDenyTSConnections" -Value 0', desc:'Fernzugriff per Registry aktivieren. Danach Firewall-Regel aktivieren: netsh advfirewall firewall set rule "Remote Desktop" new enable=yes', tags:['ps','admin','remote'] },
+    { name:'WinRM aktivieren', cmd:'Enable-PSRemoting -Force', desc:'PowerShell-Remoting aktivieren. Nötig für Invoke-Command und Enter-PSSession. Erstellt WinRM-Listener auf Port 5985.', tags:['ps','admin','remote'] },
+    { name:'Systemeigenschaften (Remote-Tab)', cmd:'sysdm.cpl', desc:'Systemeigenschaften öffnen. Remote-Tab: RDP-Einstellungen, Remoteunterstützung aktivieren/deaktivieren.', tags:['remote','quick'] },
+    { name:'Ping mit Timestamp (PS)', cmd:'ping -t HOSTNAME | Foreach{"$(Get-Date -f HH:mm:ss): $_"}', desc:'Ping mit Uhrzeit je Zeile – ideal für Verbindungsüberwachung und Protokollierung von Ausfallzeiten.', tags:['ps','network','info'] },
+  ]},
+  { id:'gpo', label:'GPO & Richtlinien', icon:'🛡️', color:'c-gpo', dotColor:'#4ade80', filter:'gpo', items:[
+    { name:'GPO erzwingen', cmd:'gpupdate /force', desc:'Alle Gruppenrichtlinien sofort anwenden – ohne Warten auf reguläres Intervall (90 Min). /boot oder /logoff wenn nötig.', tags:['admin'] },
+    { name:'GPO-Status anzeigen', cmd:'gpresult /r', desc:'Welche GPOs wirklich angewendet wurden. /scope computer oder /scope user für gezielten Scope.', tags:['admin','info'] },
+    { name:'GPO-Report als HTML', cmd:'gpresult /h "%USERPROFILE%\\Desktop\\gpo.html"', desc:'Vollständiger GPO-Report als HTML-Datei. Zeigt alle angewendeten Richtlinien mit Quelle und Wert. Für Audits ideal.', tags:['admin','info'] },
+    { name:'GPO Remote-Report', cmd:'gpresult /h "%USERPROFILE%\\Desktop\\gpo.html" /s HOSTNAME /u DOMAIN\\USER', desc:'GPO-Report für Remote-Rechner erstellen. Nützlich wenn kein direkter Zugriff auf den PC möglich ist.', tags:['admin','remote'] },
+    { name:'Lokale Sicherheitsrichtlinie', cmd:'secpol.msc', desc:'Subset des Gruppenrichtlinien-Editors – nur sicherheitsrelevante Einstellungen. Auch auf Home-Versionen nicht verfügbar.', tags:['admin'] },
+  ]},
+  { id:'quick', label:'Schnellbefehle', icon:'🚀', color:'c-quick', dotColor:'#fbbf24', filter:'quick', items:[
+    { name:'Autostart-Ordner öffnen', cmd:'shell:startup', desc:'Öffnet Autostart-Ordner des aktuellen Benutzers. Hier abgelegte Verknüpfungen starten automatisch mit Windows.', tags:['quick'] },
+    { name:'Autostart (alle Benutzer)', cmd:'shell:common startup', desc:'Gemeinsamer Autostart für alle Benutzer. Admin nötig. Programme hier für systemweiten Autostart.', tags:['admin','quick'] },
+    { name:'Umgebungsvariablen GUI', cmd:'SystemPropertiesAdvanced', desc:'Öffnet erweiterte Systemeigenschaften mit Button "Umgebungsvariablen". PATH und andere Variablen ändern.', tags:['admin','quick'] },
+    { name:'Hosts-Datei bearbeiten', cmd:'notepad %SystemRoot%\\System32\\drivers\\etc\\hosts', desc:'Hosts-Datei in Notepad öffnen. Admin nötig zum Speichern. Einträge: IP HOSTNAME – überschreibt DNS lokal.', tags:['admin','caution'] },
+    { name:'Programme hinzufügen/entfernen', cmd:'appwiz.cpl', desc:'Klassische Deinstallations-Übersicht. Zeigt alle installierten Programme. Schneller als Einstellungen-App.', tags:['quick'] },
+    { name:'Energieoptionen', cmd:'powercfg.cpl', desc:'Energiesparpläne verwalten. powercfg /energy für Energie-Diagnose, powercfg /batteryreport für Akkubericht.', tags:['quick'] },
+    { name:'Datum & Uhrzeit', cmd:'timedate.cpl', desc:'Zeit und Zeitzone einstellen. Bei Domain-Clients wird Zeit automatisch synchronisiert (W32TM).', tags:['quick'] },
+    { name:'Soundeinstellungen', cmd:'mmsys.cpl', desc:'Audio-Geräte, Lautstärke, Aufnahme und Soundeffekte konfigurieren. Schneller als über Taskbar-Icon.', tags:['quick'] },
+    { name:'Registrierungseditor', cmd:'regedit', desc:'Registry bearbeiten. Immer Backup erstellen! Datei → Exportieren vor Änderungen. HKLM = Maschine, HKCU = User.', tags:['admin','caution'] },
+    { name:'Task-Manager', cmd:'taskmgr', desc:'Prozesse, Performance, Autostart, Benutzer und Dienste überwachen. Strg+Shift+Esc als Tastenkürzel.', tags:['quick'] },
+    { name:'Bildschirmauflösung', cmd:'desk.cpl', desc:'Anzeigeeinstellungen öffnen. Auflösung, Refresh-Rate, Mehrmonitor-Setup und Skalierung konfigurieren.', tags:['quick'] },
+    { name:'Netzwerkverbindungen', cmd:'ncpa.cpl', desc:'Alle Netzwerkadapter: aktivieren/deaktivieren, IP setzen, Adapter diagnostizieren. Schneller als Einstellungen.', tags:['network','quick'] },
+    { name:'Systemsteuerung', cmd:'control', desc:'Klassische Systemsteuerung öffnen. Viele Optionen fehlen in den modernen Einstellungen noch. Zeitloses Tool.', tags:['quick'] },
+    { name:'Windows-Features', cmd:'optionalfeatures', desc:'Windows-Features aktivieren/deaktivieren: IIS, Hyper-V, .NET Framework, Telnet-Client, TFTP-Client etc.', tags:['admin','quick'] },
+  ]},
+];
+
+const filterMap = {
+  all:    {label:'Alle',dotColor:'#7c8cf8'},
+  msc:    {label:'MMC-Konsolen',dotColor:'#7c8cf8'},
+  system: {label:'Systeminfo',dotColor:'#4ade80'},
+  network:{label:'Netzwerk',dotColor:'#2dd4bf'},
+  ps:     {label:'PowerShell',dotColor:'#a78bfa'},
+  users:  {label:'Benutzer',dotColor:'#fbbf24'},
+  disk:   {label:'Datenträger',dotColor:'#f87171'},
+  proc:   {label:'Prozesse',dotColor:'#f472b6'},
+  remote: {label:'Remote',dotColor:'#2dd4bf'},
+  gpo:    {label:'GPO',dotColor:'#4ade80'},
+  quick:  {label:'Schnellbefehle',dotColor:'#fbbf24'},
+};
+
+const filterBar = document.getElementById('filter-bar');
+filterBar.innerHTML = '';
+Object.entries(filterMap).forEach(([key,val]) => {
+  const btn = document.createElement('button');
+  btn.className = 'filter-btn' + (key==='all' ? ' active' : '');
+  btn.dataset.filter = key;
+  btn.innerHTML = `<span class="filter-dot" style="background:${val.dotColor}"></span>${val.label}`;
+  filterBar.appendChild(btn);
+});
+
+const container = document.getElementById('sections');
+let totalCmds = 0;
+SECTIONS.forEach(sec => {
+  totalCmds += sec.items.length;
+  const section = document.createElement('div');
+  section.className = 'section';
+  section.dataset.category = sec.id;
+  section.innerHTML = `<div class="section-header"><div class="section-icon" style="background:rgba(255,255,255,.05)">${sec.icon}</div><span class="section-title">${sec.label}</span><span class="section-count">${sec.items.length}</span></div><div class="cmd-grid" id="grid-${sec.id}"></div>`;
+  container.appendChild(section);
+  const grid = section.querySelector('#grid-'+sec.id);
+  sec.items.forEach(item => {
+    const card = document.createElement('div');
+    card.className = `cmd-card ${sec.color}`;
+    card.dataset.name = item.name.toLowerCase();
+    card.dataset.cmd = item.cmd.toLowerCase();
+    card.dataset.desc = item.desc.toLowerCase();
+    card.dataset.category = sec.id;
+    const tagsHTML = item.tags.map(t=>`<span class="cmd-tag tag-${t}">${t}</span>`).join('');
+    card.innerHTML = `<div class="cmd-top"><span class="cmd-name">${item.name}</span><span class="cmd-copy-btn">📋 Kopieren</span></div><div class="cmd-code">${item.cmd.replace(/</g,'&lt;')}</div><div class="cmd-desc">${item.desc}</div><div class="cmd-tags">${tagsHTML}</div>`;
+    card.addEventListener('click', () => copyCmd(item.cmd, card));
+    grid.appendChild(card);
+  });
+});
+document.getElementById('stat-cmds').textContent = totalCmds;
+document.getElementById('visible-count').textContent = totalCmds;
+
+let toastTimer;
+function copyCmd(cmd, card) {
+  navigator.clipboard.writeText(cmd).then(() => {
+    const btn = card.querySelector('.cmd-copy-btn');
+    btn.textContent = '✓ Kopiert!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '📋 Kopieren'; btn.classList.remove('copied'); }, 1800);
+    const toast = document.getElementById('toast');
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 2000);
+  });
+}
+
+let activeFilter = 'all', searchTerm = '';
+filterBar.addEventListener('click', e => {
+  const btn = e.target.closest('.filter-btn');
+  if (!btn) return;
+  activeFilter = btn.dataset.filter;
+  filterBar.querySelectorAll('.filter-btn').forEach(b => b.classList.toggle('active', b===btn));
+  applyFilters();
+});
+document.getElementById('search').addEventListener('input', e => {
+  searchTerm = e.target.value.toLowerCase().trim();
+  document.getElementById('search-term').textContent = searchTerm;
+  applyFilters();
+});
+
+function highlight(text, term) {
+  if (!term) return text;
+  return text.replace(new RegExp(`(${term.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, 'gi'), '<mark>$1</mark>');
+}
+
+function applyFilters() {
+  let visible = 0;
+  document.querySelectorAll('.section').forEach(sec => {
+    let secVisible = 0;
+    sec.querySelectorAll('.cmd-card').forEach(card => {
+      const matchCat = activeFilter==='all' || card.dataset.category===activeFilter;
+      const matchSearch = !searchTerm || card.dataset.name.includes(searchTerm) || card.dataset.cmd.includes(searchTerm) || card.dataset.desc.includes(searchTerm);
+      const show = matchCat && matchSearch;
+      card.classList.toggle('hidden', !show);
+      if (show) {
+        secVisible++; visible++;
+        if (searchTerm) {
+          card.querySelector('.cmd-name').innerHTML = highlight(card.querySelector('.cmd-name').textContent, searchTerm);
+          card.querySelector('.cmd-desc').innerHTML = highlight(card.querySelector('.cmd-desc').textContent, searchTerm);
+          const ce = card.querySelector('.cmd-code');
+          ce.innerHTML = highlight(ce.textContent, searchTerm);
+        }
+      }
+    });
+    sec.classList.toggle('hidden', secVisible===0);
+  });
+  document.getElementById('visible-count').textContent = visible;
+  document.getElementById('no-results').style.display = visible===0 ? 'block' : 'none';
+  if (!searchTerm) {
+    document.querySelectorAll('.cmd-card:not(.hidden)').forEach(card => {
+      const n=card.querySelector('.cmd-name'); n.innerHTML=n.textContent;
+      const d=card.querySelector('.cmd-desc'); d.innerHTML=d.textContent;
+    });
+  }
+}
+</script>
+</body>
+</html>

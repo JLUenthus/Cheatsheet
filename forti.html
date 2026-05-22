@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fortinet Cheatsheet</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:          #0f1117;
+  --panel:       #1a1d2e;
+  --panel2:      #21253a;
+  --border:      #2a2d3e;
+  --border2:     #343860;
+  --text:        #e0e4f0;
+  --muted:       #8890aa;
+  --dim:         #555a70;
+  /* Forti-Akzent: Orange statt Indigo */
+  --accent:      #fb7124;
+  --accent2:     #fbbf24;
+  --accent-bg:   rgba(251,113,36,0.10);
+  --accent-glow: rgba(251,113,36,0.20);
+  --green:       #4ade80;
+  --green-bg:    rgba(74,222,128,0.08);
+  --amber:       #fbbf24;
+  --amber-bg:    rgba(251,191,36,0.08);
+  --red:         #f87171;
+  --red-bg:      rgba(248,113,113,0.08);
+  --teal:        #2dd4bf;
+  --teal-bg:     rgba(45,212,191,0.08);
+  --blue:        #60a5fa;
+  --blue-bg:     rgba(96,165,250,0.08);
+  --purple:      #a78bfa;
+  --font-ui:     'Outfit', sans-serif;
+  --font-mono:   'JetBrains Mono', monospace;
+  --r:           10px;
+  --r-lg:        14px;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-ui);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.875rem;
+  min-height: 100vh;
+  line-height: 1.5;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(251,113,36,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(251,113,36,0.025) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── HEADER ── */
+header {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(15,17,23,0.92);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  height: 58px;
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+}
+.logo { display: flex; align-items: center; gap: 10px; flex-shrink: 0; text-decoration: none; }
+.logo-icon {
+  width: 32px; height: 32px;
+  background: var(--accent-bg);
+  border: 1px solid rgba(251,113,36,0.3);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 17px;
+}
+.logo-text { font-size: 1rem; font-weight: 700; color: var(--text); letter-spacing: -0.02em; }
+.logo-text span { color: var(--accent); }
+
+.search-wrap { flex: 1; max-width: 400px; position: relative; }
+.search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 15px; pointer-events: none; }
+#search {
+  width: 100%; background: var(--panel); border: 1px solid var(--border); border-radius: 8px;
+  padding: 8px 12px 8px 36px; color: var(--text); font-family: var(--font-ui); font-size: 0.85rem; outline: none;
+  transition: border-color .2s, box-shadow .2s;
+}
+#search:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+#search::placeholder { color: var(--dim); }
+
+.header-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.nav-link-windows {
+  display: flex; align-items: center; gap: 5px;
+  padding: 6px 14px; border-radius: 8px;
+  border: 1px solid var(--border2);
+  background: var(--panel);
+  color: var(--muted); font-size: 0.8rem; font-weight: 600; text-decoration: none;
+  transition: all .15s;
+}
+.nav-link-windows:hover { color: var(--text); background: var(--panel2); }
+.pill { display: flex; align-items: center; gap: 5px; border-radius: 20px; padding: 4px 10px; font-size: 0.72rem; font-weight: 600; }
+.pill-count { background: var(--accent-bg); border: 1px solid rgba(251,113,36,0.3); color: var(--accent); }
+
+/* ── HERO ── */
+.hero { position: relative; z-index: 1; text-align: center; padding: 52px 24px 40px; }
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--accent-bg); border: 1px solid rgba(251,113,36,0.3); border-radius: 20px;
+  padding: 4px 14px; font-size: 0.75rem; font-weight: 600; color: var(--accent);
+  margin-bottom: 18px; letter-spacing: 0.04em;
+}
+.hero h1 {
+  font-size: clamp(1.8rem, 4vw, 2.6rem); font-weight: 700; letter-spacing: -0.03em; line-height: 1.15; margin-bottom: 12px;
+  background: linear-gradient(135deg, #e0e4f0 0%, #fb7124 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.hero p { color: var(--muted); font-size: 0.95rem; max-width: 520px; margin: 0 auto 28px; }
+.hero-stats { display: flex; justify-content: center; gap: 24px; flex-wrap: wrap; }
+.hero-stat { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.hero-stat-num { font-size: 1.3rem; font-weight: 700; color: var(--accent); }
+.hero-stat-label { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+
+/* ── PRODUCT SWITCHER ── */
+.product-bar {
+  position: relative; z-index: 1;
+  padding: 0 24px 8px;
+  display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;
+}
+.product-btn {
+  display: flex; align-items: center; gap: 7px;
+  padding: 8px 18px; border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--muted); font-family: var(--font-ui); font-size: 0.82rem; font-weight: 600;
+  cursor: pointer; transition: all .15s;
+}
+.product-btn:hover { border-color: var(--border2); color: var(--text); background: var(--panel2); }
+.product-btn.active { background: var(--accent-bg); border-color: rgba(251,113,36,0.5); color: var(--accent); }
+.product-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+/* ── FILTER TABS ── */
+.filter-bar {
+  position: relative; z-index: 1;
+  padding: 8px 24px 20px;
+  display: flex; gap: 6px; flex-wrap: wrap; justify-content: center;
+}
+.filter-btn {
+  display: flex; align-items: center; gap: 6px;
+  padding: 5px 12px; border-radius: 8px;
+  border: 1px solid var(--border); background: var(--panel);
+  color: var(--muted); font-family: var(--font-ui); font-size: 0.78rem; font-weight: 500;
+  cursor: pointer; transition: all .15s;
+}
+.filter-btn:hover { border-color: var(--border2); color: var(--text); background: var(--panel2); }
+.filter-btn.active { background: var(--accent-bg); border-color: rgba(251,113,36,0.4); color: var(--accent); }
+.filter-dot { width: 7px; height: 7px; border-radius: 50%; }
+
+/* ── MAIN ── */
+main { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding: 0 24px 80px; }
+
+/* ── SECTION ── */
+.section { margin-bottom: 28px; }
+.section-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; padding: 0 2px; }
+.section-icon { width: 28px; height: 28px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+.section-title { font-size: 0.9rem; font-weight: 600; color: var(--text); letter-spacing: -0.01em; }
+.section-count { font-size: 0.72rem; color: var(--muted); background: var(--panel); border: 1px solid var(--border); border-radius: 20px; padding: 1px 8px; }
+.section-product {
+  font-size: 0.68rem; font-weight: 700; padding: 2px 8px; border-radius: 4px; letter-spacing: 0.04em; text-transform: uppercase;
+}
+.sp-fg  { background: rgba(251,113,36,0.12); color: #fb7124; }
+.sp-fmg { background: rgba(96,165,250,0.12); color: #60a5fa; }
+.sp-faz { background: rgba(167,139,250,0.12); color: #a78bfa; }
+
+/* ── CMD GRID ── */
+.cmd-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 8px; }
+
+/* ── CMD CARD ── */
+.cmd-card {
+  background: var(--panel); border: 1px solid var(--border); border-radius: var(--r);
+  padding: 12px 14px; cursor: pointer;
+  transition: border-color .15s, background .15s, transform .1s;
+  position: relative; overflow: hidden;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.cmd-card::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+  border-radius: 3px 0 0 3px; opacity: 0; transition: opacity .2s;
+}
+.cmd-card:hover { border-color: var(--border2); background: var(--panel2); transform: translateY(-1px); }
+.cmd-card:hover::before { opacity: 1; }
+.cmd-card:active { transform: scale(0.99); }
+
+.c-fg::before   { background: var(--accent); }
+.c-fmg::before  { background: var(--blue); }
+.c-faz::before  { background: var(--purple); }
+
+.cmd-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+.cmd-name { font-size: 0.85rem; font-weight: 600; color: var(--text); line-height: 1.3; }
+.cmd-copy-btn {
+  flex-shrink: 0; display: flex; align-items: center; gap: 4px;
+  font-size: 0.7rem; color: var(--dim); padding: 2px 7px; border-radius: 5px;
+  border: 1px solid transparent; transition: all .15s; white-space: nowrap;
+}
+.cmd-card:hover .cmd-copy-btn { color: var(--muted); border-color: var(--border); background: var(--panel); }
+.cmd-copy-btn.copied { color: var(--green) !important; border-color: rgba(74,222,128,0.3) !important; background: var(--green-bg) !important; }
+
+.cmd-code {
+  font-family: var(--font-mono); font-size: 0.75rem; color: var(--accent);
+  background: rgba(251,113,36,0.06); border: 1px solid rgba(251,113,36,0.12);
+  border-radius: 6px; padding: 6px 8px; word-break: break-all; line-height: 1.5;
+}
+.c-fmg .cmd-code { color: var(--blue); background: rgba(96,165,250,0.06); border-color: rgba(96,165,250,0.12); }
+.c-faz .cmd-code { color: var(--purple); background: rgba(167,139,250,0.06); border-color: rgba(167,139,250,0.12); }
+
+.cmd-desc { font-size: 0.78rem; color: var(--muted); line-height: 1.45; }
+.cmd-tags { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 2px; }
+.cmd-tag { font-size: 0.65rem; font-weight: 600; padding: 2px 7px; border-radius: 4px; letter-spacing: 0.03em; text-transform: uppercase; }
+.tag-fg      { background: rgba(251,113,36,0.12); color: #fb7124; }
+.tag-fmg     { background: rgba(96,165,250,0.12); color: #60a5fa; }
+.tag-faz     { background: rgba(167,139,250,0.12); color: #a78bfa; }
+.tag-cli     { background: rgba(74,222,128,0.10); color: #4ade80; }
+.tag-gui     { background: rgba(251,191,36,0.10); color: #fbbf24; }
+.tag-vpn     { background: rgba(45,212,191,0.10); color: #2dd4bf; }
+.tag-ha      { background: rgba(248,113,113,0.10); color: #f87171; }
+.tag-caution { background: rgba(248,113,113,0.10); color: #f87171; }
+.tag-info    { background: rgba(251,113,36,0.08); color: #fb9154; }
+.tag-policy  { background: rgba(167,139,250,0.10); color: #a78bfa; }
+.tag-log     { background: rgba(167,139,250,0.10); color: #a78bfa; }
+.tag-diag    { background: rgba(45,212,191,0.10); color: #2dd4bf; }
+
+.cmd-card.hidden { display: none; }
+.section.hidden  { display: none; }
+
+#no-results { display: none; text-align: center; color: var(--muted); padding: 60px 0; font-size: 1rem; }
+
+/* ── TOAST ── */
+#toast {
+  position: fixed; bottom: 24px; right: 24px;
+  background: var(--panel2); border: 1px solid var(--border2); border-radius: 10px;
+  padding: 10px 18px; font-size: 0.82rem; color: var(--green); font-weight: 500;
+  display: flex; align-items: center; gap: 7px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  opacity: 0; transform: translateY(8px); transition: all .2s; pointer-events: none; z-index: 999;
+}
+#toast.show { opacity: 1; transform: translateY(0); }
+
+footer {
+  position: relative; z-index: 1; border-top: 1px solid var(--border);
+  padding: 20px 24px; text-align: center; color: var(--dim); font-size: 0.78rem;
+}
+footer span { color: var(--muted); }
+
+mark { background: rgba(251,113,36,0.22); color: var(--accent); border-radius: 2px; padding: 0 1px; }
+
+@media (max-width: 600px) {
+  .cmd-grid { grid-template-columns: 1fr; }
+  header { padding: 0 14px; }
+  main { padding: 0 14px 60px; }
+  .filter-bar, .product-bar { padding: 0 14px 16px; }
+  .hero h1 { font-size: 1.6rem; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <a href="index.html" class="logo">
+    <div class="logo-icon">🔥</div>
+    <div class="logo-text">Forti<span>Sheet</span></div>
+  </a>
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input type="text" id="search" placeholder="Befehle suchen...">
+  </div>
+  <div class="header-right">
+    <a href="index.html" class="nav-link-windows">⚡ Windows</a>
+    <div class="pill pill-count">
+      <span id="visible-count">0</span> Befehle
+    </div>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="hero-badge">🔥 Fortinet Cheatsheet</div>
+  <h1>FortiGate · FortiManager<br>FortiAnalyzer</h1>
+  <p>CLI-Befehle, Diagnose-Tools und Konfigurationshilfen für Fortinet-Administratoren. Klick = Kopiert.</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><span class="hero-stat-num" id="stat-cmds">0</span><span class="hero-stat-label">Befehle</span></div>
+    <div class="hero-stat"><span class="hero-stat-num">3</span><span class="hero-stat-label">Produkte</span></div>
+    <div class="hero-stat"><span class="hero-stat-num">FortiOS</span><span class="hero-stat-label">7.x / 6.4</span></div>
+    <div class="hero-stat"><span class="hero-stat-num">FMG/FAZ</span><span class="hero-stat-label">7.x</span></div>
+  </div>
+</div>
+
+<div class="product-bar" id="product-bar">
+  <button class="product-btn active" data-product="all"><span class="product-dot" style="background:#fb7124"></span>Alle Produkte</button>
+  <button class="product-btn" data-product="fg"><span class="product-dot" style="background:#fb7124"></span>FortiGate</button>
+  <button class="product-btn" data-product="fmg"><span class="product-dot" style="background:#60a5fa"></span>FortiManager</button>
+  <button class="product-btn" data-product="faz"><span class="product-dot" style="background:#a78bfa"></span>FortiAnalyzer</button>
+</div>
+
+<div class="filter-bar" id="filter-bar"></div>
+
+<main>
+  <div id="no-results">Keine Befehle gefunden für "<span id="search-term"></span>"</div>
+  <div id="sections"></div>
+</main>
+
+<footer>
+  FortiSheet · <span>FortiOS 7.x / 6.4 · FortiManager & FortiAnalyzer 7.x</span> · Klick kopiert den Befehl
+</footer>
+<div id="toast">✓ Kopiert!</div>
+
+<script>
+const SECTIONS = [
+
+  /* ═══════════════════════════════════════════════
+     FORTIGATE
+  ═══════════════════════════════════════════════ */
+  {
+    id: 'fg-basics', label: 'FortiGate – Grundbefehle', icon: '🔥', product: 'fg', colorClass: 'c-fg', productTag: 'fg',
+    items: [
+      { name: 'In VDOM wechseln', cmd: 'config vdom\n  edit VDOM-NAME\n  next\nend', desc: 'In eine bestimmte VDOM wechseln. "root" ist die Standard-VDOM. Alle nachfolgenden Befehle gelten dann im Kontext dieser VDOM.', tags: ['fg','cli'] },
+      { name: 'Aktuelle VDOM anzeigen', cmd: 'get system vdom-list', desc: 'Alle konfigurierten VDOMs mit ID und Status. Zeigt ob VDOM-Modus aktiv ist.', tags: ['fg','cli','info'] },
+      { name: 'System-Status anzeigen', cmd: 'get system status', desc: 'FortiOS-Version, Seriennummer, Build, Uptime, HA-Status und Lizenzinfo in einer Ausgabe. Erste Anlaufstelle.', tags: ['fg','cli','info'] },
+      { name: 'Laufende Konfiguration anzeigen', cmd: 'show full-configuration', desc: 'Komplette Konfiguration ausgeben inkl. Standardwerte. Ohne "full" nur Änderungen vom Default. Für Audits.', tags: ['fg','cli','info'] },
+      { name: 'Konfiguration speichern', cmd: 'execute backup config ftp DATEINAME FTP-IP', desc: 'Config per FTP sichern. Alternativ: execute backup config tftp DATEINAME TFTP-IP oder über GUI (System → Backup).', tags: ['fg','cli','caution'] },
+      { name: 'Konfiguration auf Festplatte', cmd: 'execute backup config flash DATEINAME', desc: 'Backup auf internem Flash-Speicher des FortiGate ablegen. execute restore config flash DATEINAME zum Einspielen.', tags: ['fg','cli'] },
+      { name: 'FortiGate neu starten', cmd: 'execute reboot', desc: 'Gerät nach Bestätigung neu starten. Änderungen vorher mit execute backup config sichern! HA-Failover beachten.', tags: ['fg','cli','caution'] },
+      { name: 'Firmware-Version', cmd: 'get system status | grep Version', desc: 'Nur die Firmware-Version filtern. Vollständig: get system status zeigt Build-Nummer und Patch-Level.', tags: ['fg','cli','info'] },
+    ]
+  },
+  {
+    id: 'fg-network', label: 'FortiGate – Netzwerk & Interfaces', icon: '🌐', product: 'fg', colorClass: 'c-fg', productTag: 'fg',
+    items: [
+      { name: 'Alle Interfaces anzeigen', cmd: 'get system interface physical', desc: 'Status, IP, MAC, Speed/Duplex und Verbindungsstatus aller physischen Interfaces. Für logische Interfaces: ohne "physical".', tags: ['fg','cli','info'] },
+      { name: 'Interface-Details', cmd: 'diagnose hardware deviceinfo nic PORT1', desc: 'Hardware-Details eines Interfaces: Treiber, Duplex, Autoneg, RX/TX-Counters, Fehler. PORT1 durch Interface-Name ersetzen.', tags: ['fg','cli','diag'] },
+      { name: 'Routing-Tabelle', cmd: 'get router info routing-table all', desc: 'Komplette Routing-Tabelle mit Protokoll, Next-Hop, Interface und Metrik. "details" anhängen für mehr Info.', tags: ['fg','cli','info'] },
+      { name: 'ARP-Tabelle', cmd: 'get system arp', desc: 'ARP-Cache mit IP, MAC, Interface und Alter. Hilfreich bei Verbindungsproblemen im lokalen Segment.', tags: ['fg','cli','info'] },
+      { name: 'Aktive Sessions anzeigen', cmd: 'diagnose sys session list', desc: 'Alle aktiven Firewall-Sessions. Kombinieren mit: | grep "proto=6" für TCP, | grep SRCIP für bestimmte IP.', tags: ['fg','cli','diag'] },
+      { name: 'Session-Statistik', cmd: 'diagnose sys session stat', desc: 'Session-Tabellen-Auslastung: aktuell, Maximum, Setup-Rate. Wichtig für Kapazitätsplanung.', tags: ['fg','cli','diag','info'] },
+      { name: 'DNS-Abfrage testen', cmd: 'execute ping-options source INTERFACE-IP\nexecute ping HOSTNAME', desc: 'Ping mit bestimmter Quell-IP. Vorher source setzen um richtiges Interface zu verwenden. Auch FQDN möglich.', tags: ['fg','cli','diag'] },
+      { name: 'Traceroute', cmd: 'execute traceroute ZIEL-IP', desc: 'Routenverfolgung zum Ziel. Zeigt Hops und Latenzen. execute traceroute-options view-settings für Optionen.', tags: ['fg','cli','diag'] },
+      { name: 'Interface Traffic-Counter', cmd: 'diagnose netlink interface list PORT1', desc: 'RX/TX-Bytes, Pakete, Fehler und Drops pro Interface. Hilfreich zur Fehlersuche bei Paketverlust.', tags: ['fg','cli','diag'] },
+      { name: 'SD-WAN Status', cmd: 'diagnose sys virtual-wan-link health-check', desc: 'SD-WAN Performance-Checks: Latenz, Jitter, Paketverlust und Status je ISP-Link. Basis für SLA-Monitoring.', tags: ['fg','cli','info','diag'] },
+    ]
+  },
+  {
+    id: 'fg-policy', label: 'FortiGate – Firewall-Policy', icon: '🛡️', product: 'fg', colorClass: 'c-fg', productTag: 'fg',
+    items: [
+      { name: 'Alle Policies auflisten', cmd: 'show firewall policy', desc: 'Alle Firewall-Regeln mit ID, Name, Srcintf, Dstintf, Action, Schedule und Profiles. Übersicht ohne Details.', tags: ['fg','cli','policy'] },
+      { name: 'Policy-Details anzeigen', cmd: 'show firewall policy POLICY-ID', desc: 'Detailkonfiguration einer bestimmten Policy-ID. Alle gesetzten Parameter inkl. Profile und Log-Einstellungen.', tags: ['fg','cli','policy'] },
+      { name: 'Policy-Hit-Counter', cmd: 'diagnose firewall iprope show 00100004 0', desc: 'Hit-Counter aller Policies anzeigen. 00100004 = Policy-Table-ID für IPv4. Nützlich für unused-Policy-Suche.', tags: ['fg','cli','diag','policy'] },
+      { name: 'Policy-Lookup (Traffic-Test)', cmd: 'diagnose firewall iprope lookup SRCIP DSTIP PROTO SPORT DPORT', desc: 'Welche Policy greift für einen bestimmten Traffic? Gibt Policy-ID und Action zurück. Ideal zum Debuggen.', tags: ['fg','cli','diag','policy'] },
+      { name: 'Policy-Counter zurücksetzen', cmd: 'diagnose firewall iprope flush 00100004', desc: 'Alle Policy-Byte/Paket-Counter zurücksetzen. Nützlich um seit einem Zeitpunkt Traffic zu messen.', tags: ['fg','cli','caution'] },
+      { name: 'Address-Objekte anzeigen', cmd: 'show firewall address', desc: 'Alle Adressobjekte: Name, Typ (Subnet, FQDN, Range) und Wert. Für Gruppen: show firewall addrgrp', tags: ['fg','cli','info'] },
+      { name: 'Services anzeigen', cmd: 'show firewall service custom', desc: 'Benutzerdefinierte Service-Objekte. Vordefinierte: show firewall service predefined | grep "set name"', tags: ['fg','cli','info'] },
+    ]
+  },
+  {
+    id: 'fg-vpn', label: 'FortiGate – VPN', icon: '🔐', product: 'fg', colorClass: 'c-fg', productTag: 'fg',
+    items: [
+      { name: 'IPSec Tunnels – Status', cmd: 'get vpn ipsec tunnel summary', desc: 'Alle IPSec-Tunnel mit Status (up/down), Selektoren und Bytes. Erste Übersicht für VPN-Monitoring.', tags: ['fg','cli','vpn','info'] },
+      { name: 'IPSec Tunnel – Details', cmd: 'diagnose vpn tunnel list name TUNNEL-NAME', desc: 'Detaillierter Status eines Tunnels: SA, Algorithmen, SPI, Traffic-Zähler und Lifetime.', tags: ['fg','cli','vpn','diag'] },
+      { name: 'IKE Informationen', cmd: 'diagnose vpn ike gateway list', desc: 'IKE Phase-1 Gateways: Status, Algorithmen, DH-Gruppe, lokale/remote IP und SA-Informationen.', tags: ['fg','cli','vpn','diag'] },
+      { name: 'IPSec Debug aktivieren', cmd: 'diagnose debug application ike -1\ndiagnose debug enable', desc: 'IKE-Debug für Tunnel-Troubleshooting. Erzeugt viele Logs – nach Analyse mit: diagnose debug disable deaktivieren!', tags: ['fg','cli','vpn','diag','caution'] },
+      { name: 'Tunnel neu aufbauen', cmd: 'diagnose vpn tunnel reset name TUNNEL-NAME', desc: 'IPSec-Tunnel zurücksetzen und neu aufbauen. Alle SAs werden gelöscht. Kurze Verbindungsunterbrechung.', tags: ['fg','cli','vpn','caution'] },
+      { name: 'SSL-VPN Sessions', cmd: 'get vpn ssl monitor', desc: 'Aktive SSL-VPN Verbindungen: Benutzer, IP, Verbindungszeit, Tunnel-Typ und zugewiesene IP.', tags: ['fg','cli','vpn','info'] },
+      { name: 'SSL-VPN Benutzer trennen', cmd: 'diagnose vpn ssl del-tunnel vd root name BENUTZERNAME', desc: 'Einzelnen SSL-VPN Benutzer trennen. Hilfreich wenn Sitzung hängt oder Benutzer gesperrt werden soll.', tags: ['fg','cli','vpn','caution'] },
+      { name: 'BGP-Nachbarn anzeigen', cmd: 'get router info bgp summary', desc: 'BGP-Peering-Status, empfangene/gesendete Prefixe und Uptime. Für SDWAN und Provider-Anbindungen.', tags: ['fg','cli','info'] },
+    ]
+  },
+  {
+    id: 'fg-diag', label: 'FortiGate – Diagnose & Debug', icon: '🔍', product: 'fg', colorClass: 'c-fg', productTag: 'fg',
+    items: [
+      { name: 'Debug Flow – Traffic verfolgen', cmd: 'diagnose debug flow filter addr SRCIP\ndiagnose debug flow show iprope enable\ndiagnose debug flow show function-name enable\ndiagnose debug enable\ndiagnose debug flow trace start 100', desc: 'Mächtigstes Debugging-Tool: zeigt Paket-für-Paket wie FortiGate den Traffic verarbeitet. Policy-Match, NAT, Routing alles sichtbar. Nach Analyse: diagnose debug flow stop && diagnose debug disable', tags: ['fg','cli','diag','caution'] },
+      { name: 'Debug deaktivieren', cmd: 'diagnose debug disable\ndiagnose debug reset', desc: 'Alle Debug-Ausgaben stoppen und Filter zurücksetzen. Immer ausführen nach Diagnose – Debug kostet Performance!', tags: ['fg','cli','diag'] },
+      { name: 'CPU-Auslastung', cmd: 'get system performance status', desc: 'CPU, RAM, Sessions, Uptime und Network-Utilization in Echtzeit. Wichtig für Performance-Analyse.', tags: ['fg','cli','diag','info'] },
+      { name: 'Top-Prozesse', cmd: 'diagnose sys top 3 20', desc: 'Top-Prozesse nach CPU-Nutzung. Erstes Argument = Intervall in Sekunden, zweites = Anzahl Prozesse.', tags: ['fg','cli','diag'] },
+      { name: 'Hardware-NIC Status', cmd: 'diagnose hardware deviceinfo nic PORT1', desc: 'Detaillierter NIC-Status: Link, Speed, Duplex, RX/TX-Fehler. Port-Name anpassen (z.B. wan1, internal).', tags: ['fg','cli','diag'] },
+      { name: 'Sniffer / Paketmitschnitt', cmd: 'diagnose sniffer packet PORT1 "host 1.2.3.4" 4 0 l', desc: 'Eingebauter Paket-Sniffer. Filter in tcpdump-Syntax. Level 4 = mit Ethernet-Header. 0 = unbegrenzt. l = verbose.', tags: ['fg','cli','diag'] },
+      { name: 'FortiGuard Verbindung testen', cmd: 'execute ping update.fortiguard.net', desc: 'Erreichbarkeit von FortiGuard prüfen. Für Lizenz-/Update-Probleme. Alternativ: diagnose debug application update -1', tags: ['fg','cli','diag'] },
+      { name: 'NTP-Status', cmd: 'diagnose sys ntp status', desc: 'NTP-Synchronisationsstatus, konfigurierte Server, Offset und Stratumebene. Falsche Zeit = VPN/Zertifikatsprobleme.', tags: ['fg','cli','diag','info'] },
+      { name: 'HA-Status anzeigen', cmd: 'get system ha status', desc: 'HA-Cluster-Status: Master/Slave, Sync-Status, Failover-Zähler, Uptime und Synchronisationsinformationen.', tags: ['fg','cli','ha','info'] },
+      { name: 'HA Sync-Status', cmd: 'diagnose sys ha showcsum', desc: 'Prüft ob Konfigurationen zwischen HA-Mitgliedern synchron sind. Unterschiedliche Checksummen = Sync-Problem.', tags: ['fg','cli','ha','diag'] },
+      { name: 'HA Failover erzwingen', cmd: 'diagnose sys ha reset-uptime', desc: 'Erzwingt HA-Failover indem Uptime zurückgesetzt wird. Der andere Node wird Master. Nur in Wartungsfenstern!', tags: ['fg','cli','ha','caution'] },
+    ]
+  },
+  {
+    id: 'fg-log', label: 'FortiGate – Logs & Monitoring', icon: '📋', product: 'fg', colorClass: 'c-fg', productTag: 'fg',
+    items: [
+      { name: 'Lokale Logs anzeigen', cmd: 'execute log filter category 0\nexecute log display', desc: 'Lokale Traffic-Logs anzeigen. Kategorie 0=Traffic, 1=Event, 3=VPN, 4=URL-Filter. Zeitraum mit execute log filter setzen.', tags: ['fg','cli','log'] },
+      { name: 'Log-Filter setzen', cmd: 'execute log filter start-line 1\nexecute log filter view-lines 50\nexecute log filter device 0', desc: 'Filteroptionen für Logs: Startzeile, Anzahl Zeilen und Gerät (0=disk, 1=flash). Immer vor execute log display.', tags: ['fg','cli','log'] },
+      { name: 'Event-Logs', cmd: 'execute log filter category 1\nexecute log display', desc: 'System-Events: Admin-Logins, Config-Änderungen, HA-Events, VPN-Events. Kategorie 1 = Event-Log.', tags: ['fg','cli','log','info'] },
+      { name: 'Log-Disk-Status', cmd: 'diagnose log test\ndiagnose log device', desc: 'Log-Gerät und Status anzeigen. diagnose log test schreibt Test-Log-Einträge zum Prüfen ob Logging funktioniert.', tags: ['fg','cli','log','diag'] },
+      { name: 'Syslog-Konfiguration', cmd: 'show log syslogd setting', desc: 'Konfigurierte Syslog-Server anzeigen. Für FortiAnalyzer: show log fortianalyzer setting', tags: ['fg','cli','log','info'] },
+      { name: 'FortiAnalyzer Verbindung', cmd: 'diagnose test application oftpd 2', desc: 'Verbindungsstatus zum FortiAnalyzer prüfen. Zeigt ob FAZ erreichbar und Logs werden gesendet.', tags: ['fg','cli','log','faz','diag'] },
+    ]
+  },
+  {
+    id: 'fg-user', label: 'FortiGate – Benutzer & Authentifizierung', icon: '👤', product: 'fg', colorClass: 'c-fg', productTag: 'fg',
+    items: [
+      { name: 'Admin-Accounts anzeigen', cmd: 'show system admin', desc: 'Alle lokalen Admin-Accounts mit Profil und Trusted-Host-Einschränkungen. Passwörter sind gehasht.', tags: ['fg','cli','info'] },
+      { name: 'Angemeldete Admins', cmd: 'get system session | grep admin', desc: 'Aktive Admin-Sessions anzeigen. Für vollständige Info: diagnose sys session filter proto 443', tags: ['fg','cli','info'] },
+      { name: 'LDAP-Verbindung testen', cmd: 'diagnose test authserver ldap LDAP-SERVER BENUTZERNAME PASSWORT', desc: 'LDAP-Authentication testen ohne GUI. Gibt Gruppen zurück wenn erfolgreich. Passwort wird im Klartext gesendet – nur in sicherer Umgebung!', tags: ['fg','cli','diag','caution'] },
+      { name: 'RADIUS-Verbindung testen', cmd: 'diagnose test authserver radius RADIUS-SERVER pap BENUTZERNAME PASSWORT', desc: 'RADIUS-Auth testen. Protokoll: pap, chap, mschapv2. Zeigt Accept/Reject und Attribute zurück.', tags: ['fg','cli','diag','caution'] },
+      { name: 'Lokale Benutzer anzeigen', cmd: 'show user local', desc: 'Lokale Benutzerkonten: Name, Typ, Status und 2FA-Einstellungen. Für Gruppen: show user group', tags: ['fg','cli','info'] },
+      { name: 'Firewall-Authentifizierung', cmd: 'diagnose firewall auth list', desc: 'Aktiv authentifizierte Benutzer an der Firewall: IP, Benutzer, Gruppe, Timeout. Für Captive Portal und aktive Auth.', tags: ['fg','cli','info','diag'] },
+    ]
+  },
+
+  /* ═══════════════════════════════════════════════
+     FORTIMANAGER
+  ═══════════════════════════════════════════════ */
+  {
+    id: 'fmg-basics', label: 'FortiManager – Grundbefehle', icon: '🗂️', product: 'fmg', colorClass: 'c-fmg', productTag: 'fmg',
+    items: [
+      { name: 'System-Status', cmd: 'get system status', desc: 'FMG-Version, Seriennummer, Uptime, Lizenz-Status und verwaltete Geräte-Anzahl. Erste Orientierung.', tags: ['fmg','cli','info'] },
+      { name: 'Verwaltete Geräte anzeigen', cmd: 'diagnose dvm device list', desc: 'Alle verwalteten FortiGates: Name, IP, Status (managed/unmanaged), OS-Version und letzte Verbindung.', tags: ['fmg','cli','info'] },
+      { name: 'ADOM-Liste', cmd: 'diagnose dvm adom list', desc: 'Alle konfigurierten ADOMs (Administrative Domains): Name, ID, FortiOS-Version und Geräteanzahl.', tags: ['fmg','cli','info'] },
+      { name: 'Verbindung zu FGT prüfen', cmd: 'diagnose dvm device detail GERÄTENAME', desc: 'Detaillierter Verbindungsstatus eines verwalteten FortiGate: IP, Version, HA-Status, Tunnel-Status.', tags: ['fmg','cli','diag','info'] },
+      { name: 'FGFM Tunnel Status', cmd: 'diagnose fgfm session-list', desc: 'Aktive FGFM-Management-Tunnel zu allen verwalteten Geräten. Zeigt ob Verbindung aktiv und in Sync ist.', tags: ['fmg','cli','diag','info'] },
+      { name: 'FMG neu starten', cmd: 'execute reboot', desc: 'FortiManager nach Bestätigung neu starten. Verbindungen zu allen FGTs werden kurz unterbrochen. Wartungsfenster einplanen!', tags: ['fmg','cli','caution'] },
+      { name: 'Datenbank-Backup', cmd: 'execute backup all-settings ftp DATEINAME FTP-IP', desc: 'Vollbackup aller FMG-Einstellungen inkl. ADOM-Daten per FTP. Regelmäßig ausführen vor großen Änderungen.', tags: ['fmg','cli','caution'] },
+    ]
+  },
+  {
+    id: 'fmg-policy', label: 'FortiManager – Policy & Deployment', icon: '📤', product: 'fmg', colorClass: 'c-fmg', productTag: 'fmg',
+    items: [
+      { name: 'Policy-Package installieren (CLI)', cmd: 'diagnose dvm check-integrity ADOM-NAME', desc: 'Integrität eines Policy-Packages prüfen bevor Installation. Findet Fehler und inkonsistente Objekte.', tags: ['fmg','cli','policy'] },
+      { name: 'Installationsqueue anzeigen', cmd: 'diagnose dvm task list', desc: 'Aktive und abgeschlossene Tasks: Install, Import, Script-Execution. Status und Fehlermeldungen einsehbar.', tags: ['fmg','cli','info','policy'] },
+      { name: 'Config-Diff anzeigen', cmd: 'diagnose dvm device diff GERÄTENAME', desc: 'Unterschiede zwischen FMG-Konfiguration und aktueller Gerätekonfiguration anzeigen. Vor Installation prüfen.', tags: ['fmg','cli','diag','policy'] },
+      { name: 'Auto-Link Gerät', cmd: 'diagnose dvm device auto-link', desc: 'Nicht zugewiesene Geräte automatisch einem ADOM zuordnen. Hilfreich bei Massenregistrierung neuer FortiGates.', tags: ['fmg','cli'] },
+      { name: 'Script auf FGT ausführen', cmd: 'diagnose dvm script run SKRIPT-NAME GERÄTENAME', desc: 'CLI-Skript aus FMG-Bibliothek auf einem verwalteten FortiGate ausführen. Log-Output in Task-Monitor sichtbar.', tags: ['fmg','cli','caution'] },
+      { name: 'Objekte importieren', cmd: 'diagnose dvm import-device GERÄTENAME', desc: 'Aktuelle Konfiguration eines FortiGate in FMG importieren. Überschreibt bestehende FMG-Objekte für dieses Gerät!', tags: ['fmg','cli','caution'] },
+    ]
+  },
+  {
+    id: 'fmg-diag', label: 'FortiManager – Diagnose', icon: '🔧', product: 'fmg', colorClass: 'c-fmg', productTag: 'fmg',
+    items: [
+      { name: 'Debug für FGFM', cmd: 'diagnose debug application fgfmd 255\ndiagnose debug enable', desc: 'FGFM-Verbindungsdebug – für Troubleshooting wenn FGTs sich nicht verbinden. Nach Diagnose: diagnose debug disable', tags: ['fmg','cli','diag','caution'] },
+      { name: 'Logs anzeigen', cmd: 'diagnose debug application dnsproxy -1\nexecute log display', desc: 'Interne FMG-Logs anzeigen. Kategorie und Filter mit execute log filter setzen wie bei FortiGate.', tags: ['fmg','cli','log','diag'] },
+      { name: 'Datenbank-Integrität', cmd: 'diagnose dvm check-integrity all', desc: 'Alle ADOMs auf Datenbank-Inkonsistenzen prüfen. Kann bei Problemen nach Upgrades oder Crashes helfen.', tags: ['fmg','cli','diag'] },
+      { name: 'Hintergrundprozesse', cmd: 'diagnose sys top 3 20', desc: 'Prozesse nach CPU-Verbrauch. Gleiche Syntax wie FortiGate. fgfmd = Management-Daemon, sqldb = Datenbank.', tags: ['fmg','cli','diag','info'] },
+      { name: 'Workspace-Modus Status', cmd: 'diagnose dvm adom workspace list', desc: 'Zeigt welche ADOMs im Workspace-/Lock-Modus sind und wer gerade welchen ADOM gesperrt hat.', tags: ['fmg','cli','info'] },
+    ]
+  },
+
+  /* ═══════════════════════════════════════════════
+     FORTIANALYZER
+  ═══════════════════════════════════════════════ */
+  {
+    id: 'faz-basics', label: 'FortiAnalyzer – Grundbefehle', icon: '📊', product: 'faz', colorClass: 'c-faz', productTag: 'faz',
+    items: [
+      { name: 'System-Status', cmd: 'get system status', desc: 'FAZ-Version, Seriennummer, Uptime, Lizenz und Anzahl registrierter Geräte. Erste Anlaufstelle.', tags: ['faz','cli','info'] },
+      { name: 'Registrierte Geräte', cmd: 'diagnose dvm device list', desc: 'Alle beim FAZ registrierten Log-Sender: Name, IP, Status und letzte Log-Aktivität.', tags: ['faz','cli','info'] },
+      { name: 'Log-Empfang Status', cmd: 'diagnose test application logd 4', desc: 'Log-Daemon-Status: Empfangsrate, Queue-Größe und ob Logs verarbeitet werden. Wichtig bei fehlenden Logs.', tags: ['faz','cli','diag','log'] },
+      { name: 'Disk-Auslastung', cmd: 'diagnose system df', desc: 'Festplattenauslastung: Log-Partition, System-Partition. Volle Log-Partition = keine neuen Logs gespeichert!', tags: ['faz','cli','info','diag'] },
+      { name: 'Log-Queue anzeigen', cmd: 'diagnose log device', desc: 'Log-Geräte und deren Status. Zeigt ob Puffer läuft oder Logs verworfen werden.', tags: ['faz','cli','log','diag'] },
+      { name: 'ADOM-Quota anzeigen', cmd: 'diagnose dvm adom list', desc: 'ADOMs mit zugewiesenem Speicher, genutztem Speicher und Retention-Policy. Für Speicherplanung.', tags: ['faz','cli','info'] },
+      { name: 'FAZ neu starten', cmd: 'execute reboot', desc: 'FortiAnalyzer neu starten. Logs werden während Neustart nicht empfangen. FAZ am besten mit FortiGate-Puffer.', tags: ['faz','cli','caution'] },
+    ]
+  },
+  {
+    id: 'faz-diag', label: 'FortiAnalyzer – Diagnose & Logs', icon: '🔍', product: 'faz', colorClass: 'c-faz', productTag: 'faz',
+    items: [
+      { name: 'Eingehende Logs prüfen', cmd: 'diagnose test application logd 7', desc: 'Zeigt Statistiken zum Log-Eingang: Logs pro Sekunde, gesamt empfangen, verworfen. Für Monitoring der Log-Rate.', tags: ['faz','cli','diag','log'] },
+      { name: 'Log-Datenbankstatus', cmd: 'diagnose sql status worker', desc: 'SQL-Worker-Prozesse und deren Status. Hängender Worker = Logs werden nicht indiziert = keine Reports.', tags: ['faz','cli','diag','log'] },
+      { name: 'Reports neu generieren', cmd: 'diagnose test application reportd 1', desc: 'Report-Daemon neu starten. Hilfreich wenn Reports nicht generiert werden oder fehlerhaft aussehen.', tags: ['faz','cli','diag'] },
+      { name: 'Debug Log-Empfang', cmd: 'diagnose debug application logd 255\ndiagnose debug enable', desc: 'Ausführliches Logging des Log-Daemons. Zeigt jede Verbindung und Log-Paket. Sehr verbose – nach Diagnose deaktivieren!', tags: ['faz','cli','diag','caution'] },
+      { name: 'Verbindung von FGT prüfen', cmd: 'diagnose dvm device detail GERÄTENAME', desc: 'Verbindungsstatus eines bestimmten Log-Senders: IP, Version, letzter Log-Eingang, Status.', tags: ['faz','cli','diag','info'] },
+      { name: 'Archivierte Logs anzeigen', cmd: 'execute log-index list', desc: 'Übersicht der Log-Archive nach Datum und Gerät. execute log-index retrieve zum Zugriff auf archivierte Logs.', tags: ['faz','cli','log','info'] },
+      { name: 'Retention-Policy anzeigen', cmd: 'show system log-forward', desc: 'Log-Weiterleitungsregeln und Aufbewahrungsrichtlinien. show system global für globale Log-Einstellungen.', tags: ['faz','cli','info','log'] },
+      { name: 'Backup erstellen', cmd: 'execute backup all-settings ftp DATEINAME FTP-IP', desc: 'Vollbackup des FortiAnalyzer (Konfiguration, keine Log-Daten). Log-Daten separates Backup-Konzept erforderlich.', tags: ['faz','cli','caution'] },
+    ]
+  },
+];
+
+// Build category filter map from sections
+const categoryMap = {};
+SECTIONS.forEach(s => {
+  categoryMap[s.id] = { label: s.label.split(' – ')[1] || s.label, dot: s.colorClass === 'c-fg' ? '#fb7124' : s.colorClass === 'c-fmg' ? '#60a5fa' : '#a78bfa', product: s.product };
+});
+
+// Build filter buttons (subcategories)
+const filterBar = document.getElementById('filter-bar');
+let filterHTML = '<button class="filter-btn active" data-filter="all"><span class="filter-dot" style="background:#fb7124"></span>Alle Kategorien</button>';
+SECTIONS.forEach(s => {
+  const dot = s.colorClass === 'c-fg' ? '#fb7124' : s.colorClass === 'c-fmg' ? '#60a5fa' : '#a78bfa';
+  const shortLabel = s.label.split(' – ')[1] || s.label;
+  filterHTML += `<button class="filter-btn" data-filter="${s.id}" data-product="${s.product}"><span class="filter-dot" style="background:${dot}"></span>${shortLabel}</button>`;
+});
+filterBar.innerHTML = filterHTML;
+
+// Build sections & cards
+const container = document.getElementById('sections');
+let totalCmds = 0;
+
+SECTIONS.forEach(sec => {
+  totalCmds += sec.items.length;
+  const section = document.createElement('div');
+  section.className = 'section';
+  section.dataset.category = sec.id;
+  section.dataset.product = sec.product;
+
+  const prodLabel = { fg: 'FortiGate', fmg: 'FortiManager', faz: 'FortiAnalyzer' }[sec.product];
+  const prodClass = `sp-${sec.product}`;
+
+  section.innerHTML = `
+    <div class="section-header">
+      <div class="section-icon" style="background:rgba(255,255,255,0.05)">${sec.icon}</div>
+      <span class="section-title">${sec.label}</span>
+      <span class="section-product ${prodClass}">${prodLabel}</span>
+      <span class="section-count">${sec.items.length}</span>
+    </div>
+    <div class="cmd-grid" id="grid-${sec.id}"></div>
+  `;
+  container.appendChild(section);
+
+  const grid = section.querySelector(`#grid-${sec.id}`);
+  sec.items.forEach(item => {
+    const card = document.createElement('div');
+    card.className = `cmd-card ${sec.colorClass}`;
+    card.dataset.name = item.name.toLowerCase();
+    card.dataset.cmd = item.cmd.toLowerCase();
+    card.dataset.desc = item.desc.toLowerCase();
+    card.dataset.category = sec.id;
+    card.dataset.product = sec.product;
+
+    const tagsHTML = item.tags.map(t => `<span class="cmd-tag tag-${t}">${t}</span>`).join('');
+    const cmdDisplay = item.cmd.replace(/\n/g, '<br>').replace(/</g,'&lt;');
+
+    card.innerHTML = `
+      <div class="cmd-top">
+        <span class="cmd-name">${item.name}</span>
+        <span class="cmd-copy-btn">📋 Kopieren</span>
+      </div>
+      <div class="cmd-code">${cmdDisplay}</div>
+      <div class="cmd-desc">${item.desc}</div>
+      <div class="cmd-tags">${tagsHTML}</div>
+    `;
+    card.addEventListener('click', () => copyCmd(item.cmd, card));
+    grid.appendChild(card);
+  });
+});
+
+document.getElementById('stat-cmds').textContent = totalCmds;
+document.getElementById('visible-count').textContent = totalCmds;
+
+// Copy
+let toastTimer;
+function copyCmd(cmd, card) {
+  navigator.clipboard.writeText(cmd).then(() => {
+    const btn = card.querySelector('.cmd-copy-btn');
+    btn.textContent = '✓ Kopiert!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '📋 Kopieren'; btn.classList.remove('copied'); }, 1800);
+    const toast = document.getElementById('toast');
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 2000);
+  });
+}
+
+// Product filter
+let activeProduct = 'all';
+let activeCategory = 'all';
+let searchTerm = '';
+
+document.getElementById('product-bar').addEventListener('click', e => {
+  const btn = e.target.closest('.product-btn');
+  if (!btn) return;
+  activeProduct = btn.dataset.product;
+  document.querySelectorAll('.product-btn').forEach(b => b.classList.toggle('active', b === btn));
+  // Reset category filter when switching product
+  activeCategory = 'all';
+  filterBar.querySelectorAll('.filter-btn').forEach(b => b.classList.toggle('active', b.dataset.filter === 'all'));
+  applyFilters();
+});
+
+filterBar.addEventListener('click', e => {
+  const btn = e.target.closest('.filter-btn');
+  if (!btn) return;
+  activeCategory = btn.dataset.filter;
+  filterBar.querySelectorAll('.filter-btn').forEach(b => b.classList.toggle('active', b === btn));
+  applyFilters();
+});
+
+document.getElementById('search').addEventListener('input', e => {
+  searchTerm = e.target.value.toLowerCase().trim();
+  document.getElementById('search-term').textContent = searchTerm;
+  applyFilters();
+});
+
+function highlight(text, term) {
+  if (!term) return text;
+  return text.replace(new RegExp(`(${term.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, 'gi'), '<mark>$1</mark>');
+}
+
+function applyFilters() {
+  let visible = 0;
+  document.querySelectorAll('.section').forEach(sec => {
+    const matchProduct = activeProduct === 'all' || sec.dataset.product === activeProduct;
+    const matchCategory = activeCategory === 'all' || sec.dataset.category === activeCategory;
+    if (!matchProduct || !matchCategory) { sec.classList.add('hidden'); return; }
+    let secVisible = 0;
+    sec.querySelectorAll('.cmd-card').forEach(card => {
+      const matchSearch = !searchTerm ||
+        card.dataset.name.includes(searchTerm) ||
+        card.dataset.cmd.includes(searchTerm) ||
+        card.dataset.desc.includes(searchTerm);
+      card.classList.toggle('hidden', !matchSearch);
+      if (matchSearch) { secVisible++; visible++; }
+      if (matchSearch && searchTerm) {
+        card.querySelector('.cmd-name').innerHTML = highlight(card.querySelector('.cmd-name').textContent, searchTerm);
+        card.querySelector('.cmd-desc').innerHTML = highlight(card.querySelector('.cmd-desc').textContent, searchTerm);
+      }
+    });
+    sec.classList.toggle('hidden', secVisible === 0);
+  });
+  document.getElementById('visible-count').textContent = visible;
+  document.getElementById('no-results').style.display = visible === 0 ? 'block' : 'none';
+  if (!searchTerm) {
+    document.querySelectorAll('.cmd-card:not(.hidden)').forEach(card => {
+      const n = card.querySelector('.cmd-name'); n.innerHTML = n.textContent;
+      const d = card.querySelector('.cmd-desc'); d.innerHTML = d.textContent;
+    });
+  }
+}
+</script>
+</body>
+</html>
