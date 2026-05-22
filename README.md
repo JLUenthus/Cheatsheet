@@ -1,9 +1,9 @@
 # 🛠️ IT Admin Cheatsheet
 
 Eine interaktive Web-Referenz für Windows- und Fortinet-Administratoren.  
-Befehle suchen, filtern und per Klick in die Zwischenablage kopieren – plus eine fertige PowerShell-Skript-Bibliothek zum direkten Download.
+Befehle suchen, filtern und per Klick in die Zwischenablage kopieren. Plus eine fertige PowerShell-Skript-Bibliothek zum direkten Download.
 
-🔗 **[→ Zur Live-Version](https://DEINNAME.github.io/REPO-NAME)**
+🔗 **[→ Zur Live-Version](https://jluenthus.github.io/Cheatsheet)**
 
 ---
 
