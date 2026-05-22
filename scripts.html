@@ -32,6 +32,7 @@ header{position:sticky;top:0;z-index:100;background:rgba(15,17,23,.92);backdrop-
 #search::placeholder{color:var(--dim);}
 .header-right{display:flex;align-items:center;gap:8px;flex-shrink:0;}
 .nav-link{display:flex;align-items:center;gap:5px;padding:6px 14px;border-radius:8px;border:1px solid var(--border2);background:var(--panel);color:var(--muted);font-size:.8rem;font-weight:600;text-decoration:none;transition:all .15s;}
+.nav-sep{width:1px;height:24px;background:var(--border2);margin:0 4px;}
 .nav-link:hover{color:var(--text);background:var(--panel2);}
 .nav-link-forti{border-color:rgba(251,113,36,.35);background:rgba(251,113,36,.08);color:#fb7124;}
 .nav-link-forti:hover{background:rgba(251,113,36,.16);}
@@ -154,6 +155,7 @@ mark{background:rgba(74,222,128,.2);color:var(--accent);border-radius:2px;paddin
   </div>
   <div class="header-right">
     <a href="mitmachen.html" class="nav-link nav-link-mitmachen">🤝 Mitmachen</a>
+    <div class="nav-sep"></div>
     <a href="index.html" class="nav-link"><span>⚡</span><span>Windows</span></a>
     <a href="forti.html" class="nav-link nav-link-forti"><span>🔥</span><span>Fortinet</span></a>
     <div class="pill"><span id="visible-count">0</span> Skripte</div>

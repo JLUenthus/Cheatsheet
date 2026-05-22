@@ -44,7 +44,7 @@ header { position:sticky; top:0; z-index:100; background:rgba(15,17,23,.92); bac
 main { position:relative; z-index:1; max-width:720px; margin:0 auto; padding:0 24px 80px; }
 
 /* TYPE SELECTOR */
-.type-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:28px; }
+.type-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:28px; }
 .type-card { background:var(--panel); border:1.5px solid var(--border); border-radius:var(--r-lg); padding:16px 14px; cursor:pointer; text-align:center; transition:all .15s; user-select:none; }
 .type-card:hover { border-color:var(--border2); background:var(--panel2); }
 .type-card.active { border-color:var(--accent); background:var(--accent-bg); }
@@ -155,6 +155,11 @@ footer span { color:var(--muted); }
       <div class="info-card-desc">Fertiges Skript mit Beschreibung und Verwendung</div>
     </div>
     <div class="info-card">
+      <div class="info-card-icon">🔥</div>
+      <div class="info-card-title">Forti-Befehl einreichen</div>
+      <div class="info-card-desc">FortiGate, FortiManager oder FortiAnalyzer CLI-Befehl</div>
+    </div>
+    <div class="info-card">
       <div class="info-card-icon">💡</div>
       <div class="info-card-title">Idee vorschlagen</div>
       <div class="info-card-desc">Neue Kategorie, Feature oder Verbesserungsvorschlag</div>
@@ -165,7 +170,11 @@ footer span { color:var(--muted); }
   <div class="type-grid" id="type-grid">
     <div class="type-card active" data-type="befehl" onclick="selectType('befehl',this)">
       <div class="type-card-icon">⚡</div>
-      <div class="type-card-label">Befehl</div>
+      <div class="type-card-label">Win-Befehl</div>
+    </div>
+    <div class="type-card" data-type="forti" onclick="selectType('forti',this)">
+      <div class="type-card-icon">🔥</div>
+      <div class="type-card-label">Forti-Befehl</div>
     </div>
     <div class="type-card" data-type="script" onclick="selectType('script',this)">
       <div class="type-card-icon">💚</div>
@@ -185,6 +194,97 @@ footer span { color:var(--muted); }
     <div class="btn-row" style="justify-content:center">
       <button class="btn-primary" onclick="resetForm()">➕ Weiteres einreichen</button>
       <a href="index.html" class="btn-secondary">← Zurück zum Cheatsheet</a>
+    </div>
+  </div>
+
+
+  <!-- FORM: FORTI -->
+  <div class="form-section" id="form-forti">
+    <div class="form-group">
+      <label>Dein Name <span>*</span></label>
+      <input type="text" id="f-name" placeholder="z.B. Max Mustermann">
+    </div>
+    <div class="form-group">
+      <label>Befehlsname / Titel <span>*</span></label>
+      <input type="text" id="f-title" placeholder="z.B. IPSec Tunnel zurücksetzen" oninput="updatePreviewForti()">
+    </div>
+    <div class="form-group">
+      <label>Produkt <span>*</span></label>
+      <select id="f-product" onchange="updatePreviewForti()">
+        <option value="">– Bitte wählen –</option>
+        <option value="fg">FortiGate</option>
+        <option value="fmg">FortiManager</option>
+        <option value="faz">FortiAnalyzer</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Kategorie <span>*</span></label>
+      <select id="f-cat" onchange="updatePreviewForti()">
+        <option value="">– Bitte wählen –</option>
+        <optgroup label="FortiGate">
+          <option value="fg-basics">Grundbefehle</option>
+          <option value="fg-network">Netzwerk & Interfaces</option>
+          <option value="fg-policy">Firewall-Policy</option>
+          <option value="fg-vpn">VPN</option>
+          <option value="fg-diag">Diagnose & Debug</option>
+          <option value="fg-log">Logs & Monitoring</option>
+          <option value="fg-user">Benutzer & Auth</option>
+        </optgroup>
+        <optgroup label="FortiManager">
+          <option value="fmg-basics">Grundbefehle</option>
+          <option value="fmg-policy">Policy & Deployment</option>
+          <option value="fmg-diag">Diagnose</option>
+        </optgroup>
+        <optgroup label="FortiAnalyzer">
+          <option value="faz-basics">Grundbefehle</option>
+          <option value="faz-diag">Diagnose & Logs</option>
+        </optgroup>
+        <option value="neu">Neue Kategorie vorschlagen</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Befehl <span>*</span></label>
+      <textarea id="f-cmd" placeholder="diagnose vpn tunnel reset name TUNNEL-NAME" style="font-family:var(--font-mono);font-size:.82rem;min-height:80px;" oninput="updatePreviewForti()"></textarea>
+      <div class="input-hint">Mehrzeilige Befehle möglich – jede Zeile = eine Zeile im Terminal</div>
+    </div>
+    <div class="form-group">
+      <label>Beschreibung <span>*</span></label>
+      <textarea id="f-desc" placeholder="Was macht der Befehl? Wann ist er nützlich? Besonderheiten oder Warnhinweise?" oninput="updatePreviewForti()"></textarea>
+    </div>
+    <div class="form-group">
+      <label>Tags</label>
+      <div class="tag-grid">
+        <input type="checkbox" class="tag-check f-tag" id="ft-cli" value="cli"><label class="tag-label" for="ft-cli">💻 cli</label>
+        <input type="checkbox" class="tag-check f-tag" id="ft-diag" value="diag"><label class="tag-label" for="ft-diag">🔍 diag</label>
+        <input type="checkbox" class="tag-check f-tag" id="ft-info" value="info"><label class="tag-label" for="ft-info">ℹ️ info</label>
+        <input type="checkbox" class="tag-check f-tag" id="ft-caution" value="caution"><label class="tag-label" for="ft-caution">⚠️ caution</label>
+        <input type="checkbox" class="tag-check f-tag" id="ft-vpn" value="vpn"><label class="tag-label" for="ft-vpn">🔐 vpn</label>
+        <input type="checkbox" class="tag-check f-tag" id="ft-ha" value="ha"><label class="tag-label" for="ft-ha">🔄 ha</label>
+        <input type="checkbox" class="tag-check f-tag" id="ft-policy" value="policy"><label class="tag-label" for="ft-policy">🛡️ policy</label>
+        <input type="checkbox" class="tag-check f-tag" id="ft-log" value="log"><label class="tag-label" for="ft-log">📋 log</label>
+        <input type="checkbox" class="tag-check f-tag" id="ft-remote" value="remote"><label class="tag-label" for="ft-remote">🔗 remote</label>
+      </div>
+      <div style="margin-top:10px;">
+        <input type="text" id="f-tag-custom" placeholder="Neuen Tag vorschlagen ...">
+        <div class="input-hint">Kein passender Tag dabei? Eigenen vorschlagen.</div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Anmerkungen (optional)</label>
+      <textarea id="f-note" placeholder="Weitere Infos, FortiOS-Version, bekannte Einschränkungen..." style="min-height:60px;" oninput="updatePreviewForti()"></textarea>
+    </div>
+
+    <div class="preview-box">
+      <div class="preview-header">
+        <span class="preview-title">📋 Copy-Paste für forti.html</span>
+        <button class="btn-secondary" style="padding:5px 12px;font-size:.75rem;" onclick="copyPreviewForti()">Kopieren</button>
+      </div>
+      <div class="preview-body" id="f-preview">// Formular ausfüllen um Vorschau zu sehen...</div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-primary" onclick="submitForti()">🔥 Per Outlook einreichen</button>
+      <button class="btn-secondary" onclick="copyPreviewForti()">📋 Nur Code kopieren</button>
     </div>
   </div>
 
@@ -236,6 +336,14 @@ footer span { color:var(--muted); }
         <input type="checkbox" class="tag-check b-tag" id="t-remote" value="remote"><label class="tag-label" for="t-remote">🔗 remote</label>
         <input type="checkbox" class="tag-check b-tag" id="t-quick" value="quick"><label class="tag-label" for="t-quick">🚀 quick</label>
         <input type="checkbox" class="tag-check b-tag" id="t-repair" value="repair"><label class="tag-label" for="t-repair">🔧 repair</label>
+        <input type="checkbox" class="tag-check b-tag" id="t-export" value="export"><label class="tag-label" for="t-export">📤 export</label>
+        <input type="checkbox" class="tag-check b-tag" id="t-diag" value="diag"><label class="tag-label" for="t-diag">🔍 diag</label>
+        <input type="checkbox" class="tag-check b-tag" id="t-ha" value="ha"><label class="tag-label" for="t-ha">🔄 ha</label>
+        <input type="checkbox" class="tag-check b-tag" id="t-vpn" value="vpn"><label class="tag-label" for="t-vpn">🔐 vpn</label>
+      </div>
+      <div style="margin-top:10px;">
+        <input type="text" id="b-tag-custom" placeholder="Neuen Tag vorschlagen (z.B. wmi, bitlocker, dns ...)" oninput="updatePreview()">
+        <div class="input-hint">Kein passender Tag dabei? Eigenen vorschlagen – wir fügen ihn hinzu.</div>
       </div>
     </div>
     <div class="form-group">
@@ -385,7 +493,8 @@ function updatePreview() {
   const cmd   = document.getElementById('b-cmd').value   || 'befehl';
   const cat   = document.getElementById('b-cat').value   || 'network';
   const desc  = document.getElementById('b-desc').value  || 'Beschreibung';
-  const tags  = getSelectedTags() || "'info'";
+  const customTag = document.getElementById('b-tag-custom').value.trim();
+  const tags  = [getSelectedTags(), customTag ? `'${customTag}'` : ''].filter(Boolean).join(',') || "'info'";
 
   const escaped = cmd.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
   const escapedDesc = desc.replace(/'/g, "\\'");
@@ -622,6 +731,7 @@ function resetForm() {
   document.querySelectorAll('.tag-check').forEach(cb => cb.checked = false);
   updatePreview();
   updatePreviewScript();
+updatePreviewForti();
 }
 
 let toastEl;
@@ -638,9 +748,103 @@ function showToast(msg) {
   toastEl._t = setTimeout(() => { toastEl.style.opacity = '0'; }, 2000);
 }
 
+
+// ── FORTI PREVIEW ───────────────────────────────────────
+function getFortiTags() {
+  return [...document.querySelectorAll('.f-tag:checked')].map(c => `'${c.value}'`).join(',');
+}
+
+function updatePreviewForti() {
+  const title   = document.getElementById('f-title').value   || 'Titel';
+  const product = document.getElementById('f-product').value || 'fg';
+  const cat     = document.getElementById('f-cat').value     || 'fg-basics';
+  const cmd     = document.getElementById('f-cmd').value     || 'befehl';
+  const desc    = document.getElementById('f-desc').value    || 'Beschreibung';
+  const customTag = document.getElementById('f-tag-custom') ? document.getElementById('f-tag-custom').value.trim() : '';
+  const tags    = [getFortiTags(), customTag ? `'${customTag}'` : ''].filter(Boolean).join(',') || `'${product}','cli'`;
+
+  const colorClass = product === 'fg' ? 'c-fg' : product === 'fmg' ? 'c-fmg' : 'c-faz';
+  const prodTag    = product;
+  const escapedCmd = cmd.replace(/\/g,'\\').replace(/'/g,"\'").replace(/\n/g,'\\n');
+  const escapedDesc= desc.replace(/'/g,"\'");
+
+  document.getElementById('f-preview').textContent =
+`{ name: '${title}',
+  cmd: '${escapedCmd}',
+  desc: '${escapedDesc}',
+  tags: [${tags}] },
+
+// Einzufügen in: SECTIONS Array in forti.html
+// Abschnitt: id='${cat}'`;
+}
+
+function copyPreviewForti() {
+  const txt = document.getElementById('f-preview').textContent;
+  if (txt.startsWith('//') && txt.includes('Formular')) return;
+  navigator.clipboard.writeText(txt).then(() => showToast('Code kopiert!'));
+}
+
+function submitForti() {
+  const name    = document.getElementById('f-name').value.trim();
+  const title   = document.getElementById('f-title').value.trim();
+  const product = document.getElementById('f-product').value;
+  const cat     = document.getElementById('f-cat').value;
+  const cmd     = document.getElementById('f-cmd').value.trim();
+  const desc    = document.getElementById('f-desc').value.trim();
+  const note    = document.getElementById('f-note').value.trim();
+  const tags    = [...document.querySelectorAll('.f-tag:checked')].map(c => c.value).join(', ');
+  const customTag = document.getElementById('f-tag-custom') ? document.getElementById('f-tag-custom').value.trim() : '';
+  const preview = document.getElementById('f-preview').textContent;
+
+  if (!name || !title || !product || !cat || !cmd || !desc) {
+    alert('Bitte alle Pflichtfelder (*) ausfüllen.');
+    return;
+  }
+
+  const prodLabels = { fg:'FortiGate', fmg:'FortiManager', faz:'FortiAnalyzer' };
+  const subject = encodeURIComponent(`[AdminSheet] Forti-Befehl: ${title} (${prodLabels[product]})`);
+  const body = encodeURIComponent(
+`Hallo,
+
+ich möchte folgenden Fortinet-Befehl für das IT Admin Cheatsheet einreichen:
+
+──────────────────────────────
+VON:        ${name}
+TYP:        Fortinet CLI-Befehl
+PRODUKT:    ${prodLabels[product]}
+KATEGORIE:  ${cat}
+──────────────────────────────
+
+TITEL:      ${title}
+TAGS:       ${tags || '–'}${customTag ? '
+NEUER TAG:  ' + customTag : ''}
+
+BEFEHL:
+${cmd}
+
+BESCHREIBUNG:
+${desc}
+${note ? '
+ANMERKUNGEN:
+' + note : ''}
+
+──────────────────────────────
+COPY-PASTE FÜR forti.html:
+──────────────────────────────
+${preview}
+
+──────────────────────────────
+Viele Grüße
+${name}`);
+
+  window.location.href = `mailto:${MAIL_TO}?subject=${subject}&body=${body}`;
+  showSuccess();
+}
+
 // Init previews
 updatePreview();
 updatePreviewScript();
+updatePreviewForti();
 </script>
 </body>
 </html>
