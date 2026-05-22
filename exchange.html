@@ -2,6 +2,8 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0f1117">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Exchange Cheatsheet</title>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -178,7 +180,7 @@ mark{background:rgba(232,179,57,.22);color:var(--onprem);border-radius:2px;paddi
 
 <footer>
   ExchangeSheet · <span>Exchange 2016/2019 On-Premises & Exchange Online</span>
-  <br><a href="mitmachen.html" class="footer-mitmachen">🤝 Befehl einreichen</a>
+  <br><div style="display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:12px;"><a href="mitmachen.html" class="footer-mitmachen">🤝 Befehl einreichen</a><a href="mitmachen.html#offline" class="footer-mitmachen" style="border-color:rgba(74,222,128,.35);background:rgba(74,222,128,.08);color:#4ade80;">📲 App installieren / Offline</a></div>
 </footer>
 <div id="toast">✓ Kopiert!</div>
 
@@ -487,6 +489,15 @@ function applyFilters() {
       const d=card.querySelector('.cmd-desc'); d.innerHTML=d.textContent;
     });
   }
+}
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').then(reg => {
+      console.log('[AdminSheet] Service Worker registered');
+    }).catch(err => console.warn('[AdminSheet] SW registration failed:', err));
+  });
 }
 </script>
 <script src="nav.js"></script>

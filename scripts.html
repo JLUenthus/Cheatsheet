@@ -2,6 +2,8 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0f1117">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PowerShell Scripts</title>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -278,7 +280,7 @@ mark{background:rgba(74,222,128,.2);color:var(--accent);border-radius:2px;paddin
   <div class="script-grid" id="grid"></div>
 </main>
 
-<footer><a href="mitmachen.html" class="footer-mitmachen">🤝 Script einreichen</a><br>
+<footer><div style="display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;"><a href="mitmachen.html" class="footer-mitmachen">🤝 Script einreichen</a><a href="mitmachen.html#offline" class="footer-mitmachen" style="border-color:rgba(74,222,128,.35);background:rgba(74,222,128,.08);color:#4ade80;">📲 App installieren / Offline</a></div>
   PSScripts · <span>PowerShell 5.1+ · Windows 10/11 & Server 2019/2022</span> · Alle Skripte im Ordner /powershell/</footer>
 <div id="toast">✓ Kopiert!</div>
 
@@ -872,6 +874,15 @@ buildCards();
     </div>
   </div>
 </div>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').then(reg => {
+      console.log('[AdminSheet] Service Worker registered');
+    }).catch(err => console.warn('[AdminSheet] SW registration failed:', err));
+  });
+}
+</script>
 <script src="nav.js"></script>
 </body>
 </html>
