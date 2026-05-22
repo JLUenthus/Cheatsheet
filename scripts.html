@@ -142,6 +142,94 @@ mark{background:rgba(74,222,128,.2);color:var(--accent);border-radius:2px;paddin
   main{padding:0 14px 60px;}
   .header-right .nav-link span{display:none;}
 }
+
+/* ── POWER PLAN BUILDER ── */
+.btn-builder {
+  display:flex;align-items:center;gap:7px;padding:9px 18px;border-radius:8px;
+  background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.35);color:#fbbf24;
+  font-family:var(--font-ui);font-size:.82rem;font-weight:600;cursor:pointer;transition:all .15s;
+}
+.btn-builder:hover { background:rgba(251,191,36,.22);border-color:rgba(251,191,36,.6); }
+
+.power-modal {
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:300;
+  align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto;
+}
+.power-modal.open { display:flex; }
+.power-inner {
+  background:var(--panel);border:1px solid var(--border2);border-radius:var(--r-lg);
+  width:100%;max-width:860px;margin:auto;display:flex;flex-direction:column;overflow:hidden;
+}
+.pm-header {
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px 22px;border-bottom:1px solid var(--border);flex-shrink:0;
+}
+.pm-title { font-size:1rem;font-weight:700;color:var(--text); }
+.pm-title span { color:#fbbf24; }
+.pm-close { background:none;border:none;color:var(--muted);font-size:1.4rem;cursor:pointer;padding:0 4px; }
+.pm-close:hover { color:var(--text); }
+.pm-body { display:grid;grid-template-columns:1fr 1fr;gap:0;max-height:75vh; }
+.pm-left { padding:18px;border-right:1px solid var(--border);overflow-y:auto; }
+.pm-right { display:flex;flex-direction:column; }
+.pm-preview-header {
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 16px;border-bottom:1px solid var(--border);flex-shrink:0;
+}
+.pm-preview-title { font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em; }
+.pm-preview-body { flex:1;overflow:auto;background:#0d1117; }
+.pm-preview-body pre { font-family:var(--font-mono);font-size:.71rem;color:#c9d1d9;padding:14px;line-height:1.65;margin:0;white-space:pre; }
+.pm-footer {
+  padding:12px 16px;border-top:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;flex-shrink:0;gap:8px;
+}
+.pm-block-count { font-size:.75rem;color:var(--muted);font-family:var(--font-mono); }
+
+/* Block items */
+.pb-block {
+  background:var(--panel2);border:1px solid var(--border);border-radius:var(--r);
+  margin-bottom:8px;overflow:hidden;transition:border-color .15s;
+}
+.pb-block.disabled { opacity:.45; }
+.pb-header {
+  display:flex;align-items:flex-start;justify-content:space-between;
+  padding:12px 14px;cursor:pointer;gap:10px;
+  transition:background .15s;
+}
+.pb-header:hover { background:rgba(255,255,255,.03); }
+.pb-left { display:flex;align-items:flex-start;gap:10px;flex:1;min-width:0; }
+.pb-right { display:flex;align-items:center;gap:8px;flex-shrink:0; }
+.pb-toggle {
+  width:36px;height:20px;border-radius:10px;background:var(--border2);
+  flex-shrink:0;position:relative;transition:background .2s;margin-top:2px;
+}
+.pb-toggle::after {
+  content:'';position:absolute;top:3px;left:3px;
+  width:14px;height:14px;border-radius:50%;background:var(--muted);
+  transition:transform .2s,background .2s;
+}
+.pb-toggle.active { background:#fbbf24; }
+.pb-toggle.active::after { transform:translateX(16px);background:#fff; }
+.pb-icon { font-size:18px;flex-shrink:0;margin-top:1px; }
+.pb-info { display:flex;flex-direction:column;gap:3px;min-width:0; }
+.pb-title { font-size:.83rem;font-weight:600;color:var(--text);line-height:1.3; }
+.pb-desc { font-size:.72rem;color:var(--muted);line-height:1.4; }
+.pb-risk {
+  font-size:.65rem;font-weight:700;padding:2px 8px;border-radius:4px;
+  text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;
+}
+.pb-risk.safe { background:rgba(74,222,128,.1);color:#4ade80; }
+.pb-risk.caution { background:rgba(251,191,36,.1);color:#fbbf24; }
+.pb-expand { font-size:.75rem;color:var(--dim);cursor:pointer;padding:4px; }
+.pb-code-wrap { border-top:1px solid var(--border);background:#0d1117; }
+.pb-code { font-family:var(--font-mono);font-size:.71rem;color:#c9d1d9;padding:12px 14px;margin:0;line-height:1.6;white-space:pre;overflow-x:auto; }
+.pb-config { display:flex;align-items:center;gap:10px;padding:8px 14px 10px 58px;border-top:1px solid var(--border);background:rgba(0,0,0,.2); }
+.pb-config label { font-size:.75rem;color:var(--muted);white-space:nowrap; }
+.pb-config-input { width:70px;padding:4px 8px;font-size:.82rem; }
+.pb-config-hint { font-size:.71rem;color:var(--dim); }
+.pb-code-toggle { font-size:.7rem;color:var(--dim);cursor:pointer;padding:2px 6px;border-radius:4px;border:1px solid var(--border);background:none;margin-left:auto; }
+.pb-code-toggle:hover { color:var(--muted); }
+
+@media(max-width:700px) { .pm-body { grid-template-columns:1fr; } .pm-right { border-top:1px solid var(--border); } }
 </style>
 </head>
 <body>
@@ -298,9 +386,24 @@ const SCRIPTS = [
     ],
     requirements: 'PowerShell 5.1+, Admin-Rechte für Remote-Abfragen, WinRM aktiv',
   },
-];
-
-// Build cards
+  ,{
+    id: 'power-plan',
+    title: 'Set-PowerPlan-Win11',
+    file: 'powershell/Set-PowerPlan-Win11.ps1',
+    category: 'system',
+    icon: '⚡',
+    iconBg: 'rgba(251,191,36,.12)',
+    subtitle: 'Energieprofil & Netzwerk-Einstellungen für Windows 11 konfigurieren',
+    desc: 'Setzt das Höchstleistungs-Profil, konfiguriert Standby-Zeiten, hält VPN im Standby aktiv, deaktiviert Energiesparmodus und Wake-on-LAN für alle Netzwerkadapter. Modular aufgebaut – einzelne Blöcke können einfach deaktiviert werden.',
+    tags: ['system', 'admin'],
+    usage: [
+      { label: 'Standard (alle Blöcke)', cmd: '.\\Set-PowerPlan-Win11.ps1' },
+    ],
+    params: [],
+    requirements: 'PowerShell 5.1+, Admin-Rechte, Windows 10/11',
+    interactive: true
+  }
+];\n\n// Build cards
 const grid = document.getElementById('grid');
 let toastTimer;
 
@@ -354,6 +457,14 @@ function buildCards() {
         </div>
       </div>
       <div class="card-footer">
+        ${s.interactive ? `
+        <button class="btn-builder" onclick="openPowerBuilder()">
+          ⚙️ Script konfigurieren
+        </button>
+        <button class="btn-view" onclick="showCode('${s.id}')">
+          👁 Vollständig ansehen
+        </button>
+        ` : `
         <a href="${s.file}" download class="btn-download">
           <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           Download .ps1
@@ -361,6 +472,7 @@ function buildCards() {
         <button class="btn-view" onclick="showCode('${s.id}')">
           👁 Code ansehen
         </button>
+        `}
         <span class="file-info">${s.file.split('/').pop()}</span>
       </div>`;
     grid.appendChild(card);
@@ -393,6 +505,261 @@ function showToast() {
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => t.classList.remove('show'), 2000);
 }
+
+
+// ── POWER PLAN INTERACTIVE BUILDER ────────────────────────────────────
+const POWER_BLOCKS = [
+  {
+    id: 'profile',
+    title: 'Höchstleistungs-Profil aktivieren',
+    icon: '⚡',
+    color: '#fbbf24',
+    risk: 'safe',
+    desc: 'Setzt das Windows-Energieprofil auf "Höchstleistung". Verhindert CPU-Throttling und sorgt für maximale Performance. Auf Laptops erhöht das den Stromverbrauch.',
+    lines: [
+      '# --- 1) Höchstleistungs-Profil aktivieren ---',
+      '$highPerfGuid = "8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c"',
+      '',
+      'powercfg -duplicatescheme $highPerfGuid 2>&1 | Out-Null',
+      'powercfg -setactive $highPerfGuid',
+      'Write-Host "[OK] Energieprofil: Höchstleistung aktiviert" -ForegroundColor Green',
+    ]
+  },
+  {
+    id: 'standby',
+    title: 'Standby-Timeout anpassen',
+    icon: '🕐',
+    color: '#60a5fa',
+    risk: 'safe',
+    desc: 'Setzt Standby-Timeout auf 30 Minuten für Netzbetrieb (AC) und Akkubetrieb (DC). Wert nach Bedarf anpassbar. 0 = niemals in Standby.',
+    configurable: true,
+    configLabel: 'Timeout (Minuten)',
+    configDefault: 30,
+    configKey: 'STANDBY_MIN',
+    lines: [
+      '# --- 2) Standby-Zeiten anpassen ---',
+      'powercfg -change -standby-timeout-ac STANDBY_MIN',
+      'powercfg -change -standby-timeout-dc STANDBY_MIN',
+      'Write-Host "[OK] Standby-Timeout: STANDBY_MIN Minuten (AC + DC)" -ForegroundColor Green',
+    ]
+  },
+  {
+    id: 'vpn',
+    title: 'VPN bleibt im Standby aktiv + Schnellstart deaktivieren',
+    icon: '🔐',
+    color: '#4ade80',
+    risk: 'caution',
+    desc: 'Hält Netzwerkadapter im Standby aktiv damit VPN-Verbindungen nicht getrennt werden. Deaktiviert außerdem den Windows-Schnellstart (HiberbootEnabled=0), der manchmal Netzwerkprobleme verursacht.',
+    lines: [
+      '# --- 3) VPN bleibt im Standby bestehen ---',
+      '$netSubGuid   = "19cbb8fa-5279-450e-9fac-8a3d5fedd0c1"',
+      '$netSettingOn = "12bbebe6-58d6-4636-95bb-3217ef867c1a"',
+      '',
+      'powercfg -setacvalueindex $highPerfGuid $netSubGuid $netSettingOn 0',
+      'powercfg -setdcvalueindex $highPerfGuid $netSubGuid $netSettingOn 0',
+      '',
+      'Set-ItemProperty -Path "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Power" `',
+      '  -Name HiberbootEnabled -Value 0 -Type DWord',
+      'Write-Host "[OK] Netzwerk im Standby: aktiv bleiben" -ForegroundColor Green',
+      'Write-Host "[OK] Schnellstart: deaktiviert" -ForegroundColor Green',
+    ]
+  },
+  {
+    id: 'adapter',
+    title: 'Netzwerkadapter: Energiesparmodus deaktivieren',
+    icon: '🌐',
+    color: '#a78bfa',
+    risk: 'caution',
+    desc: 'Deaktiviert den Energiesparmodus aller Netzwerkadapter im Geräte-Manager über WMI und Registry. Verhindert, dass Adapter abgeschaltet werden um Strom zu sparen. Adapter ohne WMI-Eintrag werden übersprungen.',
+    lines: [
+      '# --- 4) Netzwerkadapter: Power-Management im Gerätemanager ---',
+      'Get-NetAdapter | ForEach-Object {',
+      '    $adapter = $_',
+      '    try {',
+      '        $pnpDevice = Get-PnpDevice -FriendlyName $adapter.InterfaceDescription -EA Stop',
+      '        $devPath   = "HKLM:\\SYSTEM\\CurrentControlSet\\Enum\\$($pnpDevice.InstanceId)\\Device Parameters"',
+      '        if (Test-Path $devPath) {',
+      '            Set-ItemProperty -Path $devPath -Name AllowIdleIrpInD3 -Value 0 -Type DWord -EA SilentlyContinue',
+      '        }',
+      '        $wmi = Get-WmiObject MSPower_DeviceEnable -Namespace root\\wmi -EA Stop |',
+      '               Where-Object { $_.InstanceName -like "*$($pnpDevice.InstanceId)*" }',
+      '        if ($wmi) { $wmi.Enable = $false; $wmi.Put() | Out-Null }',
+      '        Write-Host "[OK] Adapter \'$($adapter.Name)\': Energiesparmodus deaktiviert" -ForegroundColor Green',
+      '    } catch {',
+      '        Write-Host "[!] Adapter \'$($adapter.Name)\': Kein WMI-Eintrag (übersprungen)" -ForegroundColor Yellow',
+      '    }',
+      '}',
+    ]
+  },
+  {
+    id: 'wol',
+    title: 'Wake-on-LAN deaktivieren',
+    icon: '📡',
+    color: '#f87171',
+    risk: 'caution',
+    desc: 'Deaktiviert Wake-on-LAN (Magic Packet und Pattern) für alle Netzwerkadapter. Verhindert ungewolltes Aufwecken durch Netzwerkpakete. Weglassen wenn WoL für Remote-Management benötigt wird.',
+    lines: [
+      '# --- 4b) Wake-on-LAN deaktivieren ---',
+      'Get-NetAdapter | ForEach-Object {',
+      '    Disable-NetAdapterPowerManagement -Name $_.Name -WakeOnMagicPacket -WakeOnPattern -EA SilentlyContinue',
+      '    Write-Host "[OK] Wake-on-LAN deaktiviert: $($_.Name)" -ForegroundColor Green',
+      '}',
+    ]
+  },
+];
+
+const POWER_HEADER = [
+  '# ============================================================',
+  '# Set-PowerPlan-Win11.ps1',
+  '# Führe als Administrator aus!',
+  '# ============================================================',
+  '',
+];
+
+const POWER_FOOTER = [
+  '',
+  '# --- Änderungen sofort übernehmen ---',
+  'powercfg -setactive $highPerfGuid',
+  'Write-Host ""',
+  'Write-Host "[FERTIG] Energieprofil gesetzt und aktiv." -ForegroundColor Cyan',
+  'Write-Host "Bitte einmal neu starten, um alle Adapter-Einstellungen zu übernehmen."',
+];
+
+function buildPowerScript(enabledIds, configValues) {
+  let lines = [...POWER_HEADER];
+  POWER_BLOCKS.forEach(block => {
+    if (enabledIds.includes(block.id)) {
+      block.lines.forEach(l => {
+        let line = l;
+        if (block.configKey && configValues[block.configKey]) {
+          line = line.replace(new RegExp(block.configKey, 'g'), configValues[block.configKey]);
+        }
+        lines.push(line);
+      });
+      lines.push('');
+    }
+  });
+  lines.push(...POWER_FOOTER);
+  return lines.join('\n');
+}
+
+function openPowerBuilder() {
+  const modal = document.getElementById('power-modal');
+  modal.classList.add('open');
+  renderPowerBlocks();
+}
+function closePowerBuilder() {
+  document.getElementById('power-modal').classList.remove('open');
+}
+
+function renderPowerBlocks() {
+  const container = document.getElementById('power-blocks');
+  const configValues = {};
+  container.innerHTML = '';
+
+  POWER_BLOCKS.forEach(block => {
+    const el = document.createElement('div');
+    el.className = 'pb-block';
+    el.id = 'pb-' + block.id;
+
+    const riskLabel = block.risk === 'caution'
+      ? '<span class="pb-risk caution">⚠️ Registry/WMI</span>'
+      : '<span class="pb-risk safe">✓ Sicher</span>';
+
+    const configHtml = block.configurable ? `
+      <div class="pb-config">
+        <label>${block.configLabel}</label>
+        <input type="number" class="pb-config-input" id="cfg-${block.id}"
+               value="${block.configDefault}" min="0" max="480"
+               onchange="updatePowerPreview()">
+        <span class="pb-config-hint">Minuten (0 = niemals)</span>
+      </div>` : '';
+
+    el.innerHTML = `
+      <div class="pb-header" onclick="toggleBlock('${block.id}')">
+        <div class="pb-left">
+          <div class="pb-toggle active" id="tog-${block.id}"></div>
+          <span class="pb-icon" style="color:${block.color}">${block.icon}</span>
+          <div class="pb-info">
+            <span class="pb-title">${block.title}</span>
+            <span class="pb-desc">${block.desc}</span>
+          </div>
+        </div>
+        <div class="pb-right">
+          ${riskLabel}
+          <button class="pb-code-toggle" onclick="toggleCode('${block.id}', event)">Code</button>
+        </div>
+      </div>
+      ${configHtml}
+      <div class="pb-code-wrap" id="code-${block.id}" style="display:none">
+        <pre class="pb-code">${block.lines.join('\n').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</pre>
+      </div>`;
+    container.appendChild(el);
+  });
+  updatePowerPreview();
+}
+
+function toggleBlock(id) {
+  const tog = document.getElementById('tog-' + id);
+  const block = document.getElementById('pb-' + id);
+  const isActive = tog.classList.toggle('active');
+  block.classList.toggle('disabled', !isActive);
+  updatePowerPreview();
+}
+
+function toggleCode(id, e) {
+  e.stopPropagation();
+  const wrap = document.getElementById('code-' + id);
+  const open = wrap.style.display === 'none';
+  wrap.style.display = open ? 'block' : 'none';
+  
+}
+
+function getEnabledIds() {
+  return POWER_BLOCKS
+    .filter(b => document.getElementById('tog-' + b.id)?.classList.contains('active'))
+    .map(b => b.id);
+}
+
+function getConfigValues() {
+  const vals = {};
+  POWER_BLOCKS.filter(b => b.configurable).forEach(b => {
+    const inp = document.getElementById('cfg-' + b.id);
+    if (inp) vals[b.configKey] = inp.value;
+  });
+  return vals;
+}
+
+function updatePowerPreview() {
+  const script = buildPowerScript(getEnabledIds(), getConfigValues());
+  const pre = document.getElementById('power-preview');
+  if (pre) pre.textContent = script;
+  const count = document.getElementById('power-block-count');
+  if (count) count.textContent = getEnabledIds().length + ' / ' + POWER_BLOCKS.length + ' Blöcke aktiv';
+}
+
+function downloadPowerScript() {
+  const script = buildPowerScript(getEnabledIds(), getConfigValues());
+  const blob = new Blob([script], { type: 'text/plain' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'Set-PowerPlan-Win11.ps1';
+  a.click();
+}
+
+function copyPowerScript() {
+  navigator.clipboard.writeText(buildPowerScript(getEnabledIds(), getConfigValues()))
+    .then(() => showToast('Script kopiert!'));
+}
+
+// Close modal on bg click
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('power-modal')?.addEventListener('click', e => {
+    if (e.target === e.currentTarget) closePowerBuilder();
+  });
+});
+
+// ── END POWER PLAN BUILDER ─────────────────────────────────────────────
 
 // Code preview – fetches the .ps1 file
 function showCode(id) {
@@ -469,5 +836,39 @@ function applyFilters() {
 
 buildCards();
 </script>
+
+<!-- POWER PLAN BUILDER MODAL -->
+<div class="power-modal" id="power-modal">
+  <div class="power-inner">
+    <div class="pm-header">
+      <div class="pm-title">⚡ <span>Set-PowerPlan-Win11</span> – Script konfigurieren</div>
+      <button class="pm-close" onclick="closePowerBuilder()">✕</button>
+    </div>
+    <div class="pm-body">
+      <div class="pm-left">
+        <div style="font-size:.75rem;color:var(--muted);margin-bottom:12px;line-height:1.5;">
+          Blöcke ein-/ausschalten und konfigurieren. Das Script wird rechts live generiert.
+        </div>
+        <div id="power-blocks"></div>
+      </div>
+      <div class="pm-right">
+        <div class="pm-preview-header">
+          <span class="pm-preview-title">📋 Generiertes Script</span>
+          <span class="pm-block-count" id="power-block-count"></span>
+        </div>
+        <div class="pm-preview-body">
+          <pre id="power-preview"></pre>
+        </div>
+        <div class="pm-footer">
+          <button class="btn-secondary" onclick="copyPowerScript()">📋 Kopieren</button>
+          <button class="btn-download" onclick="downloadPowerScript()" style="text-decoration:none;border:none;">
+            <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Download .ps1
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 </body>
 </html>
