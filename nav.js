@@ -76,6 +76,29 @@
     .as-tab.active { color:var(--tab-color,#7c8cf8);border-bottom-color:var(--tab-color,#7c8cf8); }
     .as-tab-icon { font-size:14px; }
 
+
+    /* ── SCROLL TO TOP ── */
+    .as-scroll-top {
+      position:fixed;bottom:28px;right:28px;z-index:400;
+      width:42px;height:42px;border-radius:50%;
+      background:var(--panel2,#21253a);
+      border:1px solid var(--border2,#343860);
+      color:var(--muted,#8890aa);
+      font-size:18px;cursor:pointer;
+      display:flex;align-items:center;justify-content:center;
+      opacity:0;transform:translateY(12px);
+      transition:opacity .25s,transform .25s,background .15s,color .15s,border-color .15s;
+      pointer-events:none;
+    }
+    .as-scroll-top.visible {
+      opacity:1;transform:translateY(0);
+      pointer-events:all;
+    }
+    .as-scroll-top:hover {
+      background:var(--panel,#1a1d2e);
+      color:var(--text,#e0e4f0);
+      border-color:var(--accent,#7c8cf8);
+    }
     /* ── SEARCH IMPROVEMENTS ── */
     .as-search-hint {
       position:absolute;right:12px;top:50%;transform:translateY(-50%);
@@ -87,18 +110,6 @@
     .search-wrap { position:relative; }
     #search:focus + .as-search-hint,
     #search:not(:placeholder-shown) + .as-search-hint { display:none; }
-
-    /* ── CATEGORY COPY BUTTON ── */
-    .as-cat-copy {
-      display:none;align-items:center;gap:5px;
-      padding:3px 10px;border-radius:6px;
-      border:1px solid var(--border,#2a2d3e);background:transparent;
-      color:var(--dim,#555a70);font-family:inherit;font-size:.72rem;font-weight:500;
-      cursor:pointer;transition:all .15s;margin-left:auto;
-    }
-    .section-header:hover .as-cat-copy { display:flex; }
-    .as-cat-copy:hover { color:var(--text,#e0e4f0);border-color:var(--border2,#343860);background:var(--panel2,#21253a); }
-    .as-cat-copy.done { color:#4ade80!important;border-color:rgba(74,222,128,.3)!important; }
   `;
   document.head.appendChild(style);
 
@@ -210,43 +221,17 @@
     searchEl.parentNode.appendChild(hint);
   }
 
-  // ── CATEGORY COPY BUTTONS ────────────────────────────────
-  // Inject after DOM is ready
-  function injectCopyCatButtons() {
-    document.querySelectorAll('.section-header').forEach(header => {
-      if (header.querySelector('.as-cat-copy')) return;
-      const section = header.closest('.section');
-      if (!section) return;
-      const btn = document.createElement('button');
-      btn.className = 'as-cat-copy';
-      btn.innerHTML = '📋 Alle kopieren';
-      btn.addEventListener('click', e => {
-        e.stopPropagation();
-        const cards = section.querySelectorAll('.cmd-card:not(.hidden)');
-        const text = Array.from(cards).map(card => {
-          const name = card.querySelector('.cmd-name')?.textContent || '';
-          const cmd = card.querySelector('.cmd-code')?.textContent || '';
-          return `# ${name}\n${cmd}`;
-        }).join('\n\n');
-        navigator.clipboard.writeText(text).then(() => {
-          btn.textContent = '✓ Kopiert!';
-          btn.classList.add('done');
-          setTimeout(() => { btn.innerHTML = '📋 Alle kopieren'; btn.classList.remove('done'); }, 2000);
-        });
-      });
-      header.appendChild(btn);
-    });
-  }
 
-  // Run after cards are built (small delay for dynamic pages)
-  if (document.readyState === 'complete') {
-    setTimeout(injectCopyCatButtons, 300);
-  } else {
-    document.addEventListener('DOMContentLoaded', () => setTimeout(injectCopyCatButtons, 300));
-  }
+  // ── SCROLL TO TOP ────────────────────────────────────────
+  const scrollBtn = document.createElement('button');
+  scrollBtn.className = 'as-scroll-top';
+  scrollBtn.setAttribute('aria-label', 'Nach oben scrollen');
+  scrollBtn.innerHTML = '↑';
+  scrollBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+  document.body.appendChild(scrollBtn);
 
-  // Also re-inject when filter changes (sections become visible)
-  const observer = new MutationObserver(() => injectCopyCatButtons());
-  observer.observe(document.body, { childList: true, subtree: true });
+  window.addEventListener('scroll', () => {
+    scrollBtn.classList.toggle('visible', window.scrollY > 300);
+  }, { passive: true });
 
 })();
