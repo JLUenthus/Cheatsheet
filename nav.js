@@ -79,12 +79,12 @@
 
     /* ── SCROLL TO TOP ── */
     .as-scroll-top {
-      position:fixed;bottom:28px;right:28px;z-index:400;
-      width:42px;height:42px;border-radius:50%;
+      position:fixed;bottom:32px;right:calc((100vw - 1200px) / 4);z-index:400;
+      width:64px;height:64px;border-radius:14px;
       background:var(--panel2,#21253a);
       border:1px solid var(--border2,#343860);
       color:var(--muted,#8890aa);
-      font-size:18px;cursor:pointer;
+      font-size:26px;cursor:pointer;line-height:1;padding-bottom:3px;
       display:flex;align-items:center;justify-content:center;
       opacity:0;transform:translateY(12px);
       transition:opacity .25s,transform .25s,background .15s,color .15s,border-color .15s;
