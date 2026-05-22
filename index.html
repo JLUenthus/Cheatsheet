@@ -2,6 +2,8 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0f1117">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Windows Admin Cheatsheet</title>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -447,6 +449,15 @@ function applyFilters() {
       const d=card.querySelector('.cmd-desc'); d.innerHTML=d.textContent;
     });
   }
+}
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').then(reg => {
+      console.log('[AdminSheet] Service Worker registered');
+    }).catch(err => console.warn('[AdminSheet] SW registration failed:', err));
+  });
 }
 </script>
 <script src="nav.js"></script>
