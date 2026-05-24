@@ -1,7 +1,7 @@
-// ============================================================
+// ===========================================================
 // AdminSheet – Service Worker
 // Cache-Version wird automatisch als Timestamp gesetzt
-// ============================================================
+// ===========================================================
 const CACHE_VERSION = '20260524-1146'onst CACHE_NAME = `adminsheet-${CACHE_VERSION}`;
 
 const ASSETS = [
