@@ -109,6 +109,23 @@
     /* Push header down when banner is visible */
     body.has-update header { top:42px; }
     body.has-update .as-tab-bar { top:100px; }
+
+    /* ── UPDATE CHECK BUTTON ── */
+    .as-update-check {
+      display:flex;align-items:center;gap:5px;
+      padding:5px 11px;border-radius:8px;
+      border:1px solid var(--border2,#343860);
+      background:var(--panel,#1a1d2e);
+      color:var(--muted,#8890aa);
+      font-family:inherit;font-size:.75rem;font-weight:600;
+      cursor:pointer;transition:all .15s;
+      flex-shrink:0;
+    }
+    .as-update-check:hover { color:var(--text,#e0e4f0);border-color:#555a70; }
+    .as-update-check.checking { color:var(--amber,#fbbf24);border-color:rgba(251,191,36,.4);animation:spin .8s linear infinite; }
+    .as-update-check.up-to-date { color:var(--green,#4ade80);border-color:rgba(74,222,128,.3); }
+    .as-update-check.has-update { color:var(--green,#4ade80);border-color:rgba(74,222,128,.4);background:rgba(74,222,128,.1); }
+    @keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
     /* ── SCROLL TO TOP ── */
     .as-scroll-top {
       position:fixed;bottom:32px;right:calc((100vw - 1200px) / 4);z-index:400;
@@ -253,6 +270,85 @@
     searchEl.parentNode.appendChild(hint);
   }
 
+
+
+  // ── UPDATE CHECK BUTTON ─────────────────────────────────
+  const headerRight = document.querySelector('.header-right');
+  if (headerRight && 'serviceWorker' in navigator) {
+    const checkBtn = document.createElement('button');
+    checkBtn.className = 'as-update-check';
+    checkBtn.title = 'Auf Updates prüfen';
+    checkBtn.innerHTML = '↻';
+    checkBtn.setAttribute('aria-label', 'Auf Updates prüfen');
+
+    checkBtn.addEventListener('click', () => checkForUpdate(checkBtn, true));
+    headerRight.appendChild(checkBtn);
+
+    // Auto-check on load (silently)
+    setTimeout(() => checkForUpdate(checkBtn, false), 2000);
+  }
+
+  async function checkForUpdate(btn, manual) {
+    if (!navigator.serviceWorker.controller) return;
+
+    btn.classList.add('checking');
+    btn.title = 'Prüfe auf Updates...';
+
+    try {
+      const reg = await navigator.serviceWorker.ready;
+      await reg.update(); // Force check sw.js for changes
+
+      // Small delay to let SW detect changes
+      await new Promise(r => setTimeout(r, 1500));
+
+      if (reg.waiting) {
+        // New SW is waiting – update available!
+        btn.classList.remove('checking');
+        btn.classList.add('has-update');
+        btn.innerHTML = '↻ Update!';
+        btn.title = 'Update verfügbar – klicken zum Installieren';
+
+        // Show update bar
+        const bar = document.querySelector('.as-update-bar');
+        if (bar) bar.classList.add('show');
+
+        // Tell waiting SW to take over when clicked
+        btn.addEventListener('click', () => {
+          reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+        }, { once: true });
+
+      } else if (reg.installing) {
+        // Still installing
+        btn.classList.remove('checking');
+        btn.classList.add('has-update');
+        btn.innerHTML = '↻ Lädt...';
+        btn.title = 'Update wird installiert...';
+        reg.installing.addEventListener('statechange', () => {
+          if (reg.installing?.state === 'installed') {
+            reg.waiting?.postMessage({ type: 'SKIP_WAITING' });
+          }
+        });
+      } else {
+        // Already up to date
+        btn.classList.remove('checking');
+        if (manual) {
+          btn.classList.add('up-to-date');
+          btn.innerHTML = '✓';
+          btn.title = 'Aktuell – keine Updates verfügbar';
+          setTimeout(() => {
+            btn.classList.remove('up-to-date');
+            btn.innerHTML = '↻';
+            btn.title = 'Auf Updates prüfen';
+          }, 3000);
+        }
+      }
+    } catch(err) {
+      btn.classList.remove('checking');
+      btn.innerHTML = '↻';
+      btn.title = 'Auf Updates prüfen';
+      console.warn('Update check failed:', err);
+    }
+  }
 
   // ── SCROLL TO TOP ────────────────────────────────────────
   const scrollBtn = document.createElement('button');
