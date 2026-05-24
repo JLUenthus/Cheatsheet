@@ -1,9 +1,8 @@
-// =============================================================
+// ============================================================
 // AdminSheet – Service Worker
 // Cache-Version wird automatisch als Timestamp gesetzt
-// =============================================================
-const CACHE_VERSION = '20260522-1307';
-const CACHE_NAME = `adminsheet-${CACHE_VERSION}`;
+// ============================================================
+const CACHE_VERSION = '20260524-1146'onst CACHE_NAME = `adminsheet-${CACHE_VERSION}`;
 
 const ASSETS = [
   './index.html',
@@ -14,6 +13,10 @@ const ASSETS = [
   './nav.js',
   './manifest.json',
   './sw.js',
+  './eventlog.html',
+  './eventlog-rules.json',
+  './powershell/Get-EventLogCollector-Client.ps1',
+  './powershell/Get-EventLogCollector-Server.ps1',
   './powershell/Get-SystemInventory.ps1',
   './powershell/Get-LocalAdmins.ps1',
   './powershell/Test-NetworkConnectivity.ps1',

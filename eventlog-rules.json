@@ -1,0 +1,203 @@
+{
+  "version": "1.0",
+  "lastUpdated": "2026-05-22",
+  "rules": [
+    {
+      "id": "KERNEL_POWER_41",
+      "name": "Ungeplanter Neustart (Kernel-Power)",
+      "category": "Absturz",
+      "severity": "critical",
+      "eventIds": [41],
+      "sources": ["Microsoft-Windows-Kernel-Power"],
+      "minOccurrences": 1,
+      "description": "Das System wurde unerwartet neu gestartet. Ursachen: instabiler Treiber, Überhitzung, defekter RAM oder Netzteil.",
+      "recommendations": [
+        "Temperaturen prüfen: CPU/GPU Temp mit HWInfo64 kontrollieren",
+        "RAM testen: Windows-Speicherdiagnose oder memtest86 ausführen",
+        "Treiber aktualisieren: besonders Grafik- und Chipsatz-Treiber",
+        "Ereignis-Details prüfen: BugcheckCode zeigt genaue Absturzursache",
+        "Energieplan: Höchstleistung aktivieren (Set-PowerPlan-Win11.ps1)"
+      ],
+      "relatedEventIds": [1001, 1002, 6008],
+      "tags": ["crash", "bluescreen", "neustart"],
+      "communityCount": 0
+    },
+    {
+      "id": "APP_CRASH_1000",
+      "name": "Anwendungsabsturz",
+      "category": "Absturz",
+      "severity": "error",
+      "eventIds": [1000],
+      "sources": ["Application Error"],
+      "minOccurrences": 1,
+      "description": "Eine Anwendung ist unerwartet abgestürzt. Die Fehlermeldung enthält den Prozessnamen und die fehlerhafte Modul-DLL.",
+      "recommendations": [
+        "Anwendung neu installieren oder reparieren",
+        "Visual C++ Redistributables aktualisieren",
+        ".NET Framework Version prüfen",
+        "sfc /scannow ausführen um Systemdateien zu prüfen",
+        "Speicherintegrität prüfen: DISM /Online /Cleanup-Image /RestoreHealth"
+      ],
+      "relatedEventIds": [1001, 1002],
+      "tags": ["absturz", "anwendung"],
+      "communityCount": 0
+    },
+    {
+      "id": "WLAN_DISCONNECT_10317",
+      "name": "WLAN-Verbindungsverlust nach Standby",
+      "category": "Netzwerk",
+      "severity": "warning",
+      "eventIds": [10317, 10314, 10315],
+      "sources": ["Microsoft-Windows-WLAN-AutoConfig"],
+      "minOccurrences": 2,
+      "timeWindowMinutes": 480,
+      "description": "WLAN-Adapter verliert die Verbindung, häufig nach dem Aufwachen aus dem Standby. Ursache: Energiesparmodus des Adapters.",
+      "recommendations": [
+        "Energiesparmodus deaktivieren: Gerätemanager → Netzwerkadapter → Eigenschaften → Energieverwaltung",
+        "Set-PowerPlan-Win11.ps1 Block 3+4 ausführen (VPN/Adapter Einstellungen)",
+        "WLAN-Treiber aktualisieren",
+        "Schnellstart deaktivieren: powercfg /h off"
+      ],
+      "relatedEventIds": [10000, 10001],
+      "tags": ["wlan", "netzwerk", "standby"],
+      "communityCount": 0
+    },
+    {
+      "id": "DNS_FAIL_1014",
+      "name": "DNS-Auflösung fehlgeschlagen",
+      "category": "Netzwerk",
+      "severity": "warning",
+      "eventIds": [1014],
+      "sources": ["Microsoft-Windows-DNS-Client"],
+      "minOccurrences": 3,
+      "timeWindowMinutes": 60,
+      "description": "DNS-Abfragen schlagen wiederholt fehl. Netzwerkverbindung oder DNS-Server nicht erreichbar.",
+      "recommendations": [
+        "DNS-Cache leeren: ipconfig /flushdns",
+        "DNS-Server testen: nslookup google.com 8.8.8.8",
+        "Netzwerkverbindung prüfen: ipconfig /all",
+        "Alternativen DNS setzen: 8.8.8.8 / 1.1.1.1 testen",
+        "DNS-Dienst neu starten: Restart-Service -Name 'DNS Client'"
+      ],
+      "tags": ["dns", "netzwerk"],
+      "communityCount": 0
+    },
+    {
+      "id": "SERVICE_CRASH",
+      "name": "Dienst abgestürzt / nicht startbar",
+      "category": "System",
+      "severity": "error",
+      "eventIds": [7000, 7001, 7009, 7011, 7023, 7024, 7031, 7034],
+      "sources": ["Service Control Manager"],
+      "minOccurrences": 1,
+      "description": "Ein Windows-Dienst konnte nicht gestartet werden oder ist unerwartet beendet worden.",
+      "recommendations": [
+        "Dienststatus prüfen: Get-Service | Where-Object Status -eq 'Stopped'",
+        "Dienst manuell starten: sc start Dienstname",
+        "Abhängigkeiten prüfen: sc qc Dienstname",
+        "Dienstkonto prüfen: Passwort abgelaufen oder Konto gesperrt?",
+        "Event-Details prüfen: Fehlermeldung enthält genauen Dienstnamen"
+      ],
+      "tags": ["dienst", "system"],
+      "communityCount": 0
+    },
+    {
+      "id": "DISK_ERROR",
+      "name": "Festplatten / I/O Fehler",
+      "category": "Hardware",
+      "severity": "critical",
+      "eventIds": [9, 11, 51, 52, 55, 153],
+      "sources": ["disk", "Ntfs", "volmgr"],
+      "minOccurrences": 1,
+      "description": "Fehler beim Lesen/Schreiben auf der Festplatte. Kann auf defekte Sektoren oder eine failing Festplatte hinweisen.",
+      "recommendations": [
+        "SMART-Status prüfen: CrystalDiskInfo herunterladen",
+        "chkdsk /f /r ausführen (beim nächsten Neustart)",
+        "Kabelverbindungen und SATA-Anschlüsse prüfen",
+        "Sofort Datensicherung erstellen!",
+        "Get-PhysicalDisk: HealthStatus prüfen"
+      ],
+      "tags": ["festplatte", "hardware", "daten"],
+      "communityCount": 0
+    },
+    {
+      "id": "ACCOUNT_LOCKOUT_4740",
+      "name": "Konto gesperrt",
+      "category": "Sicherheit",
+      "severity": "warning",
+      "eventIds": [4740],
+      "sources": ["Microsoft-Windows-Security-Auditing"],
+      "minOccurrences": 1,
+      "description": "Ein Benutzerkonto wurde durch zu viele fehlgeschlagene Anmeldeversuche gesperrt.",
+      "recommendations": [
+        "Konto entsperren: Unlock-ADAccount -Identity Benutzername",
+        "Ursache ermitteln: Event 4625 nach dem Benutzernamen filtern",
+        "Gespeicherte Kennwörter prüfen: Outlook, VPN, geplante Tasks",
+        "Alte Sitzungen trennen: query user / logoff SESSION-ID",
+        "Passwort auf allen Geräten aktualisieren"
+      ],
+      "tags": ["sicherheit", "konto", "ad"],
+      "communityCount": 0
+    },
+    {
+      "id": "UNEXPECTED_SHUTDOWN_6008",
+      "name": "Unerwartetes Herunterfahren",
+      "category": "Absturz",
+      "severity": "error",
+      "eventIds": [6008],
+      "sources": ["EventLog"],
+      "minOccurrences": 1,
+      "description": "Windows wurde nicht ordnungsgemäß heruntergefahren. Häufig Stromausfall, Kernel-Panic oder Hardware-Fehler.",
+      "recommendations": [
+        "USV prüfen: Stromversorgung stabil?",
+        "Temperaturen kontrollieren: Überhitzung?",
+        "Kernel-Power Event 41 suchen: gibt genauere Absturzursache",
+        "RAM testen: Windows-Speicherdiagnose ausführen"
+      ],
+      "relatedEventIds": [41],
+      "tags": ["absturz", "strom", "neustart"],
+      "communityCount": 0
+    },
+    {
+      "id": "RDS_SESSION",
+      "name": "RDS Verbindungsproblem",
+      "category": "RDS",
+      "severity": "warning",
+      "eventIds": [1149, 261, 263, 1158],
+      "sources": ["Microsoft-Windows-TerminalServices-RemoteConnectionManager"],
+      "minOccurrences": 3,
+      "timeWindowMinutes": 60,
+      "description": "Mehrere fehlgeschlagene RDS-Verbindungsversuche. Ursachen: Lizenzproblem, Zertifikat abgelaufen oder Netzwerkproblem.",
+      "recommendations": [
+        "RDS-Lizenzserver prüfen: licmgr.exe",
+        "RDS-Zertifikat prüfen: Eigenschaften des RD-Gateway",
+        "Firewall-Regel prüfen: Port 3389 (RDP) offen?",
+        "SharedComputerActivation prüfen: HKLM:\\Software\\Microsoft\\Office\\ClickToRun\\Configuration",
+        "Dienste prüfen: Remote Desktop Services, RD Licensing"
+      ],
+      "tags": ["rds", "rdp", "remotedesktop"],
+      "serverOnly": true,
+      "communityCount": 0
+    },
+    {
+      "id": "VSS_ERROR",
+      "name": "VSS / Schattenkopie Fehler",
+      "category": "Backup",
+      "severity": "error",
+      "eventIds": [12289, 8193, 8194],
+      "sources": ["VSS", "volsnap"],
+      "minOccurrences": 1,
+      "description": "Volume Shadow Copy Service Fehler. Betrifft Backups, Systemwiederherstellung und Datei-Snapshots.",
+      "recommendations": [
+        "VSS-Diagnose: vssadmin list writers",
+        "VSS neu starten: net stop vss && net start vss",
+        "Freien Speicherplatz prüfen: mindestens 10% frei für Schattenkopien",
+        "vssadmin list shadows: bestehende Schattenkopien anzeigen",
+        "Windows Backup neu konfigurieren"
+      ],
+      "tags": ["backup", "vss", "schattenkopie"],
+      "serverOnly": true,
+      "communityCount": 0
+    }
+  ]
+}
