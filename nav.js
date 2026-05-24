@@ -200,7 +200,7 @@
   // But do NOT remove the logo or pill/counter
   const headerRight = document.querySelector('.header-right');
   if (headerRight) {
-    headerRight.querySelectorAll('a.nav-link, a[class*="nav-link-"]').forEach(a => a.remove());
+    headerRight.querySelectorAll('a.nav-link, a[class*="nav-link"]').forEach(a => a.remove());
     headerRight.querySelectorAll('.nav-sep').forEach(s => s.remove());
   }
 
