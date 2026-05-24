@@ -509,7 +509,8 @@ function analyzeEvents(events) {
     const matched = events.filter(e => {
       const idMatch  = !rule.eventIds || rule.eventIds.includes(Number(e.Id));
       const srcMatch = !rule.sources  || rule.sources.some(s => (e.ProviderName||'').toLowerCase().includes(s.toLowerCase()));
-      return idMatch && srcMatch;
+      const msgMatch = !rule.messageContains || rule.messageContains.some(m => (e.Message||'').toLowerCase().includes(m.toLowerCase()));
+      return idMatch && srcMatch && msgMatch;
     });
 
     if (matched.length < (rule.minOccurrences || 1)) return;
