@@ -1,8 +1,8 @@
 // ============================================================
-// AdminSheet – Service Worker
-// Cache-Version wird automatisch als Timestamp gesetzt
+// AdminSheet – Service Worker v2
 // ============================================================
-const CACHE_VERSION = '20260524-1246'onst CACHE_NAME = `adminsheet-${CACHE_VERSION}`;
+const CACHE_VERSION = '20260524-1246';
+const CACHE_NAME = `adminsheet-${CACHE_VERSION}`;
 
 const ASSETS = [
   './index.html',
@@ -10,40 +10,44 @@ const ASSETS = [
   './forti.html',
   './scripts.html',
   './mitmachen.html',
-  './nav.js',
-  './manifest.json',
-  './sw.js',
   './eventlog.html',
   './eventlog-rules.json',
-  './powershell/Get-EventLogCollector-Client.ps1',
-  './powershell/Get-EventLogCollector-Server.ps1',
+  './nav.js',
+  './sw.js',
+  './manifest.json',
   './powershell/Get-SystemInventory.ps1',
   './powershell/Get-LocalAdmins.ps1',
   './powershell/Test-NetworkConnectivity.ps1',
   './powershell/Get-InstalledSoftware.ps1',
   './powershell/Set-PowerPlan-Win11.ps1',
-  'https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Outfit:wght@400;500;600;700&display=swap',
+  './powershell/Get-EventLogCollector-Client.ps1',
+  './powershell/Get-EventLogCollector-Server.ps1',
 ];
 
-// Install: cache everything
+// ── INSTALL: Cache alle eigenen Assets ───────────────────
 self.addEventListener('install', e => {
   e.waitUntil(
     caches.open(CACHE_NAME)
-      .then(cache => Promise.allSettled(ASSETS.map(url => cache.add(url).catch(() => {}))))
+      .then(cache => Promise.allSettled(
+        ASSETS.map(url => cache.add(url).catch(err => console.warn('[SW] Cache miss:', url, err)))
+      ))
       .then(() => self.skipWaiting())
   );
 });
 
-// Activate: remove old caches + notify clients that update is ready
+// ── ACTIVATE: Alte Caches löschen + Clients übernehmen ───
 self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys()
       .then(keys => Promise.all(
-        keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
+        keys.filter(k => k !== CACHE_NAME).map(k => {
+          console.log('[SW] Deleting old cache:', k);
+          return caches.delete(k);
+        })
       ))
       .then(() => self.clients.claim())
       .then(() => {
-        // Broadcast update info to all open tabs
+        // Alle offenen Tabs über das Update informieren
         self.clients.matchAll({ type: 'window' }).then(clients => {
           clients.forEach(client => client.postMessage({
             type: 'SW_UPDATED',
@@ -54,33 +58,61 @@ self.addEventListener('activate', e => {
   );
 });
 
-// Fetch: cache-first for local, network-first for fonts
+// ── FETCH: Smarte Cache-Strategie ────────────────────────
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
+
+  // Nur GET, kein chrome-extension
   if (e.request.method !== 'GET' || url.protocol === 'chrome-extension:') return;
 
-  if (url.hostname === 'fonts.googleapis.com' || url.hostname === 'fonts.gstatic.com') {
+  // ── HTML-Seiten: Network First ──────────────────────────
+  // Immer frische HTML laden – fällt auf Cache zurück wenn offline
+  if (e.request.destination === 'document') {
     e.respondWith(
-      fetch(e.request).then(res => {
-        caches.open(CACHE_NAME).then(c => c.put(e.request, res.clone()));
-        return res;
-      }).catch(() => caches.match(e.request))
+      fetch(e.request)
+        .then(res => {
+          if (res.ok && url.origin === self.location.origin) {
+            caches.open(CACHE_NAME).then(c => c.put(e.request, res.clone()));
+          }
+          return res;
+        })
+        .catch(() => caches.match(e.request))
     );
     return;
   }
 
+  // ── Fonts: Network First ────────────────────────────────
+  if (url.hostname.includes('fonts.googleapis') || url.hostname.includes('fonts.gstatic')) {
+    e.respondWith(
+      fetch(e.request)
+        .then(res => {
+          if (res.ok) {
+            caches.open(CACHE_NAME).then(c => c.put(e.request, res.clone()));
+          }
+          return res;
+        })
+        .catch(() => caches.match(e.request))
+    );
+    return;
+  }
+
+  // ── Alles andere (JS, JSON, PS1 etc.): Cache First ─────
+  // Schnell aus Cache, nur eigene Assets nachcachen
   e.respondWith(
     caches.match(e.request).then(cached => {
       if (cached) return cached;
       return fetch(e.request).then(res => {
-        if (res.ok) caches.open(CACHE_NAME).then(c => c.put(e.request, res.clone()));
+        // Nur eigene Assets cachen – kein Müll von externen Quellen
+        if (res.ok && url.origin === self.location.origin) {
+          caches.open(CACHE_NAME).then(c => c.put(e.request, res.clone()));
+        }
         return res;
       });
     })
   );
 });
 
-// Manual update trigger from client
+// ── MESSAGE: Manueller Skip-Waiting Trigger ───────────────
 self.addEventListener('message', e => {
   if (e.data?.type === 'SKIP_WAITING') self.skipWaiting();
 });
