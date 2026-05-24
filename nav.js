@@ -181,7 +181,7 @@
     const dd = document.createElement('div');
     dd.className = 'as-dropdown';
     PAGES.forEach((p, i) => {
-      if (i === PAGES.length - 2) { // divider before Mitmachen (last item)
+      if (i === PAGES.length - 1) { // divider before last item (Mitmachen)
         const div = document.createElement('div');
         div.className = 'as-dd-divider';
         dd.appendChild(div);
