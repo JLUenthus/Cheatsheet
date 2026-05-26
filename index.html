@@ -464,5 +464,109 @@ if ('serviceWorker' in navigator) {
 }
 </script>
 <script src="nav.js"></script>
+
+<!-- ── DEPRECATION NOTICE ────────────────────────────── -->
+<div id="dep-overlay" style="
+  display:none;
+  position:fixed;inset:0;z-index:9999;
+  background:rgba(0,0,0,.7);backdrop-filter:blur(6px);
+  align-items:center;justify-content:center;padding:20px;
+">
+  <div style="
+    background:#1a1d2e;border:1px solid #343860;border-radius:16px;
+    max-width:480px;width:100%;padding:28px;position:relative;
+    box-shadow:0 24px 64px rgba(0,0,0,.6);
+  ">
+    <!-- Icon -->
+    <div style="font-size:2rem;margin-bottom:12px;">📦</div>
+
+    <!-- Title -->
+    <h2 style="font-size:1.1rem;font-weight:700;color:#e0e4f0;margin-bottom:10px;letter-spacing:-.02em;">
+      Dieses Projekt wird nicht mehr weiterentwickelt.
+    </h2>
+
+    <!-- Text -->
+    <p style="font-size:.85rem;color:#8890aa;line-height:1.6;margin-bottom:16px;">
+      Das Windows Admin Cheatsheet wurde vollständig neu strukturiert und in ein
+      einheitliches Projekt überführt – mit Exchange, Fortinet, Event Log Analyzer,
+      PS Script-Bibliothek und mehr.
+    </p>
+
+    <!-- New project link -->
+    <a href="https://jluenthus.github.io/support.sheet" target="_blank" rel="noopener noreferrer" style="
+      display:flex;align-items:center;gap:10px;
+      padding:12px 16px;border-radius:10px;
+      border:1px solid rgba(124,140,248,.4);background:rgba(124,140,248,.1);
+      color:#7c8cf8;text-decoration:none;font-size:.88rem;font-weight:700;
+      margin-bottom:16px;transition:background .15s;
+    " onmouseover="this.style.background='rgba(124,140,248,.2)'"
+       onmouseout="this.style.background='rgba(124,140,248,.1)'">
+      <span style="font-size:1.2rem;">⚡</span>
+      <div>
+        <div>Zum neuen Projekt: support.sheet</div>
+        <div style="font-size:.73rem;font-weight:400;color:#8890aa;margin-top:2px;">jluenthus.github.io/support.sheet</div>
+      </div>
+      <span style="margin-left:auto;font-size:.9rem;">→</span>
+    </a>
+
+    <!-- PWA hint -->
+    <div style="
+      padding:10px 14px;border-radius:8px;
+      background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.25);
+      font-size:.78rem;color:#fbbf24;line-height:1.5;margin-bottom:20px;
+    ">
+      📲 <strong>PWA installiert?</strong> Bitte die App auf deinem Gerät deinstallieren,
+      da sie keine Updates mehr erhalten wird.
+    </div>
+
+    <!-- Buttons -->
+    <div style="display:flex;gap:10px;">
+      <button onclick="closeDep(true)" style="
+        flex:1;padding:10px;border-radius:8px;cursor:pointer;font-family:inherit;
+        font-size:.82rem;font-weight:600;
+        background:rgba(124,140,248,.1);border:1px solid rgba(124,140,248,.4);color:#7c8cf8;
+        transition:background .15s;
+      " onmouseover="this.style.background='rgba(124,140,248,.2)'"
+         onmouseout="this.style.background='rgba(124,140,248,.1)'">
+        Verstanden – nicht mehr anzeigen
+      </button>
+      <button onclick="closeDep(false)" style="
+        padding:10px 16px;border-radius:8px;cursor:pointer;font-family:inherit;
+        font-size:.82rem;font-weight:600;
+        background:transparent;border:1px solid #2a2d3e;color:#555a70;
+        transition:all .15s;
+      " onmouseover="this.style.color='#8890aa'"
+         onmouseout="this.style.color='#555a70'">
+        Schließen
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    // Nur anzeigen wenn nicht schon dauerhaft dismissed
+    if (localStorage.getItem('dep_dismissed') === '1') return;
+
+    const overlay = document.getElementById('dep-overlay');
+    overlay.style.display = 'flex';
+
+    // Klick außerhalb schließt (aber nicht dauerhaft)
+    overlay.addEventListener('click', function(e) {
+      if (e.target === overlay) closeDep(false);
+    });
+
+    // ESC schließt
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closeDep(false);
+    }, { once: true });
+  })();
+
+  function closeDep(permanent) {
+    if (permanent) localStorage.setItem('dep_dismissed', '1');
+    document.getElementById('dep-overlay').style.display = 'none';
+  }
+</script>
+
 </body>
 </html>
